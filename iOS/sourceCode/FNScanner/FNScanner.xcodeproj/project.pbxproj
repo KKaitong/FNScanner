@@ -1,0 +1,451 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03AD30711BCFB66A0099BECF /* UZCaptureVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 03AD306E1BCFB66A0099BECF /* UZCaptureVC.m */; settings = {ASSET_TAGS = (); }; };
+		03AD30721BCFB66A0099BECF /* UZCaptureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 03AD30701BCFB66A0099BECF /* UZCaptureView.m */; settings = {ASSET_TAGS = (); }; };
+		03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096901B70E92F00D750DC /* UZFNScanner.m */; };
+		03C096961B70E92F00D750DC /* FNScannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096921B70E92F00D750DC /* FNScannerViewController.m */; };
+		03C096971B70E92F00D750DC /* UZFNBarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096941B70E92F00D750DC /* UZFNBarViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		03C096731B70E67D00D750DC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		03AD306D1BCFB66A0099BECF /* UZCaptureVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZCaptureVC.h; sourceTree = "<group>"; };
+		03AD306E1BCFB66A0099BECF /* UZCaptureVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UZCaptureVC.m; sourceTree = "<group>"; };
+		03AD306F1BCFB66A0099BECF /* UZCaptureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZCaptureView.h; sourceTree = "<group>"; };
+		03AD30701BCFB66A0099BECF /* UZCaptureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UZCaptureView.m; sourceTree = "<group>"; };
+		03C096751B70E67D00D750DC /* libFNScanner.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFNScanner.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		03C096861B70E67D00D750DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		03C0968F1B70E92F00D750DC /* UZFNScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZFNScanner.h; sourceTree = "<group>"; };
+		03C096901B70E92F00D750DC /* UZFNScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UZFNScanner.m; sourceTree = "<group>"; };
+		03C096911B70E92F00D750DC /* FNScannerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FNScannerViewController.h; sourceTree = "<group>"; };
+		03C096921B70E92F00D750DC /* FNScannerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FNScannerViewController.m; sourceTree = "<group>"; };
+		03C096931B70E92F00D750DC /* UZFNBarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZFNBarViewController.h; sourceTree = "<group>"; };
+		03C096941B70E92F00D750DC /* UZFNBarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UZFNBarViewController.m; sourceTree = "<group>"; };
+		03C096991B70E95400D750DC /* UZModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZModule.h; sourceTree = "<group>"; };
+		03C0969A1B70E95400D750DC /* UZAppUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZAppUtils.h; sourceTree = "<group>"; };
+		03C0969B1B70E95400D750DC /* NSDictionaryUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDictionaryUtils.h; sourceTree = "<group>"; };
+		03C0969E1B70E9C100D750DC /* JapanPostBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JapanPostBarcode.h; sourceTree = "<group>"; };
+		03C0969F1B70E9C100D750DC /* NKDAbstractUPCEANBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDAbstractUPCEANBarcode.h; sourceTree = "<group>"; };
+		03C096A01B70E9C100D750DC /* NKDBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDBarcode.h; sourceTree = "<group>"; };
+		03C096A11B70E9C100D750DC /* NKDBarcodeFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDBarcodeFramework.h; sourceTree = "<group>"; };
+		03C096A21B70E9C100D750DC /* NKDBarcodeOffscreenView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDBarcodeOffscreenView.h; sourceTree = "<group>"; };
+		03C096A31B70E9C100D750DC /* NKDCodabarBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDCodabarBarcode.h; sourceTree = "<group>"; };
+		03C096A41B70E9C100D750DC /* NKDCode128Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDCode128Barcode.h; sourceTree = "<group>"; };
+		03C096A51B70E9C100D750DC /* NKDCode39Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDCode39Barcode.h; sourceTree = "<group>"; };
+		03C096A61B70E9C100D750DC /* NKDEAN13Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDEAN13Barcode.h; sourceTree = "<group>"; };
+		03C096A71B70E9C100D750DC /* NKDEAN8Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDEAN8Barcode.h; sourceTree = "<group>"; };
+		03C096A81B70E9C100D750DC /* NKDExtendedCode39Barcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDExtendedCode39Barcode.h; sourceTree = "<group>"; };
+		03C096A91B70E9C100D750DC /* NKDIndustrialTwoOfFiveBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDIndustrialTwoOfFiveBarcode.h; sourceTree = "<group>"; };
+		03C096AA1B70E9C100D750DC /* NKDInterleavedTwoOfFiveBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDInterleavedTwoOfFiveBarcode.h; sourceTree = "<group>"; };
+		03C096AB1B70E9C100D750DC /* NKDModifiedPlesseyBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDModifiedPlesseyBarcode.h; sourceTree = "<group>"; };
+		03C096AC1B70E9C100D750DC /* NKDModifiedPlesseyHexBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDModifiedPlesseyHexBarcode.h; sourceTree = "<group>"; };
+		03C096AD1B70E9C100D750DC /* NKDPlanetBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDPlanetBarcode.h; sourceTree = "<group>"; };
+		03C096AE1B70E9C100D750DC /* NKDPostnetBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDPostnetBarcode.h; sourceTree = "<group>"; };
+		03C096AF1B70E9C100D750DC /* NKDRoyalMailBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDRoyalMailBarcode.h; sourceTree = "<group>"; };
+		03C096B01B70E9C100D750DC /* NKDUPCABarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDUPCABarcode.h; sourceTree = "<group>"; };
+		03C096B11B70E9C100D750DC /* NKDUPCEBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NKDUPCEBarcode.h; sourceTree = "<group>"; };
+		03C096B21B70E9C100D750DC /* NSString-UPCEAN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString-UPCEAN.h"; sourceTree = "<group>"; };
+		03C096B31B70E9C100D750DC /* UIImage-NKDBarcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage-NKDBarcode.h"; sourceTree = "<group>"; };
+		03C096B41B70E9C100D750DC /* UIImage-Normalize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage-Normalize.h"; sourceTree = "<group>"; };
+		03C096B61B70E9C100D750DC /* bitstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitstream.h; sourceTree = "<group>"; };
+		03C096B71B70E9C100D750DC /* mask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mask.h; sourceTree = "<group>"; };
+		03C096B81B70E9C100D750DC /* QRCodeGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QRCodeGenerator.h; sourceTree = "<group>"; };
+		03C096B91B70E9C100D750DC /* qrencode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrencode.h; sourceTree = "<group>"; };
+		03C096BA1B70E9C100D750DC /* qrinput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrinput.h; sourceTree = "<group>"; };
+		03C096BB1B70E9C100D750DC /* qrspec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qrspec.h; sourceTree = "<group>"; };
+		03C096BC1B70E9C100D750DC /* rscode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rscode.h; sourceTree = "<group>"; };
+		03C096BD1B70E9C100D750DC /* split.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
+		03C096BF1B70E9C100D750DC /* Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Decoder.h; sourceTree = "<group>"; };
+		03C096C01B70E9C100D750DC /* Exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Exception.h; sourceTree = "<group>"; };
+		03C096C11B70E9C100D750DC /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
+		03C096C21B70E9C100D750DC /* ImageScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageScanner.h; sourceTree = "<group>"; };
+		03C096C31B70E9C100D750DC /* Processor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Processor.h; sourceTree = "<group>"; };
+		03C096C41B70E9C100D750DC /* Scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scanner.h; sourceTree = "<group>"; };
+		03C096C51B70E9C100D750DC /* Symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Symbol.h; sourceTree = "<group>"; };
+		03C096C61B70E9C100D750DC /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
+		03C096C71B70E9C100D750DC /* Window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window.h; sourceTree = "<group>"; };
+		03C096C81B70E9C100D750DC /* zbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zbar.h; sourceTree = "<group>"; };
+		03C096C91B70E9C100D750DC /* ZBarCameraSimulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarCameraSimulator.h; sourceTree = "<group>"; };
+		03C096CA1B70E9C100D750DC /* ZBarCaptureReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarCaptureReader.h; sourceTree = "<group>"; };
+		03C096CB1B70E9C100D750DC /* ZBarHelpController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarHelpController.h; sourceTree = "<group>"; };
+		03C096CC1B70E9C100D750DC /* ZBarImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarImage.h; sourceTree = "<group>"; };
+		03C096CD1B70E9C100D750DC /* ZBarImageScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarImageScanner.h; sourceTree = "<group>"; };
+		03C096CE1B70E9C100D750DC /* ZBarReaderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarReaderController.h; sourceTree = "<group>"; };
+		03C096CF1B70E9C100D750DC /* ZBarReaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarReaderView.h; sourceTree = "<group>"; };
+		03C096D01B70E9C100D750DC /* ZBarReaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarReaderViewController.h; sourceTree = "<group>"; };
+		03C096D11B70E9C100D750DC /* ZBarSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSDK.h; sourceTree = "<group>"; };
+		03C096D21B70E9C100D750DC /* ZBarSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSymbol.h; sourceTree = "<group>"; };
+		03C096D31B70EA6500D750DC /* UZDataUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZDataUtils.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		03C096721B70E67D00D750DC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		03C0966C1B70E67D00D750DC = {
+			isa = PBXGroup;
+			children = (
+				03C096981B70E94600D750DC /* headFile */,
+				03C096771B70E67D00D750DC /* FNScanner */,
+				03C096841B70E67D00D750DC /* FNScannerTests */,
+				03C096761B70E67D00D750DC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		03C096761B70E67D00D750DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				03C096751B70E67D00D750DC /* libFNScanner.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		03C096771B70E67D00D750DC /* FNScanner */ = {
+			isa = PBXGroup;
+			children = (
+				03C0968F1B70E92F00D750DC /* UZFNScanner.h */,
+				03C096901B70E92F00D750DC /* UZFNScanner.m */,
+				03AD306D1BCFB66A0099BECF /* UZCaptureVC.h */,
+				03AD306E1BCFB66A0099BECF /* UZCaptureVC.m */,
+				03AD306F1BCFB66A0099BECF /* UZCaptureView.h */,
+				03AD30701BCFB66A0099BECF /* UZCaptureView.m */,
+				03C096911B70E92F00D750DC /* FNScannerViewController.h */,
+				03C096921B70E92F00D750DC /* FNScannerViewController.m */,
+				03C096931B70E92F00D750DC /* UZFNBarViewController.h */,
+				03C096941B70E92F00D750DC /* UZFNBarViewController.m */,
+				03C0969C1B70E9C100D750DC /* ZBarSDK */,
+			);
+			path = FNScanner;
+			sourceTree = "<group>";
+		};
+		03C096841B70E67D00D750DC /* FNScannerTests */ = {
+			isa = PBXGroup;
+			children = (
+				03C096851B70E67D00D750DC /* Supporting Files */,
+			);
+			path = FNScannerTests;
+			sourceTree = "<group>";
+		};
+		03C096851B70E67D00D750DC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				03C096861B70E67D00D750DC /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		03C096981B70E94600D750DC /* headFile */ = {
+			isa = PBXGroup;
+			children = (
+				03C096991B70E95400D750DC /* UZModule.h */,
+				03C0969A1B70E95400D750DC /* UZAppUtils.h */,
+				03C0969B1B70E95400D750DC /* NSDictionaryUtils.h */,
+				03C096D31B70EA6500D750DC /* UZDataUtils.h */,
+			);
+			path = headFile;
+			sourceTree = "<group>";
+		};
+		03C0969C1B70E9C100D750DC /* ZBarSDK */ = {
+			isa = PBXGroup;
+			children = (
+				03C096C81B70E9C100D750DC /* zbar.h */,
+				03C096C91B70E9C100D750DC /* ZBarCameraSimulator.h */,
+				03C096CA1B70E9C100D750DC /* ZBarCaptureReader.h */,
+				03C096CB1B70E9C100D750DC /* ZBarHelpController.h */,
+				03C096CC1B70E9C100D750DC /* ZBarImage.h */,
+				03C096CD1B70E9C100D750DC /* ZBarImageScanner.h */,
+				03C096CE1B70E9C100D750DC /* ZBarReaderController.h */,
+				03C096CF1B70E9C100D750DC /* ZBarReaderView.h */,
+				03C096D01B70E9C100D750DC /* ZBarReaderViewController.h */,
+				03C096D11B70E9C100D750DC /* ZBarSDK.h */,
+				03C096D21B70E9C100D750DC /* ZBarSymbol.h */,
+				03C0969D1B70E9C100D750DC /* barEncodeArmv7s */,
+				03C096B51B70E9C100D750DC /* libqrencode */,
+				03C096BE1B70E9C100D750DC /* zbar */,
+			);
+			path = ZBarSDK;
+			sourceTree = "<group>";
+		};
+		03C0969D1B70E9C100D750DC /* barEncodeArmv7s */ = {
+			isa = PBXGroup;
+			children = (
+				03C0969E1B70E9C100D750DC /* JapanPostBarcode.h */,
+				03C0969F1B70E9C100D750DC /* NKDAbstractUPCEANBarcode.h */,
+				03C096A01B70E9C100D750DC /* NKDBarcode.h */,
+				03C096A11B70E9C100D750DC /* NKDBarcodeFramework.h */,
+				03C096A21B70E9C100D750DC /* NKDBarcodeOffscreenView.h */,
+				03C096A31B70E9C100D750DC /* NKDCodabarBarcode.h */,
+				03C096A41B70E9C100D750DC /* NKDCode128Barcode.h */,
+				03C096A51B70E9C100D750DC /* NKDCode39Barcode.h */,
+				03C096A61B70E9C100D750DC /* NKDEAN13Barcode.h */,
+				03C096A71B70E9C100D750DC /* NKDEAN8Barcode.h */,
+				03C096A81B70E9C100D750DC /* NKDExtendedCode39Barcode.h */,
+				03C096A91B70E9C100D750DC /* NKDIndustrialTwoOfFiveBarcode.h */,
+				03C096AA1B70E9C100D750DC /* NKDInterleavedTwoOfFiveBarcode.h */,
+				03C096AB1B70E9C100D750DC /* NKDModifiedPlesseyBarcode.h */,
+				03C096AC1B70E9C100D750DC /* NKDModifiedPlesseyHexBarcode.h */,
+				03C096AD1B70E9C100D750DC /* NKDPlanetBarcode.h */,
+				03C096AE1B70E9C100D750DC /* NKDPostnetBarcode.h */,
+				03C096AF1B70E9C100D750DC /* NKDRoyalMailBarcode.h */,
+				03C096B01B70E9C100D750DC /* NKDUPCABarcode.h */,
+				03C096B11B70E9C100D750DC /* NKDUPCEBarcode.h */,
+				03C096B21B70E9C100D750DC /* NSString-UPCEAN.h */,
+				03C096B31B70E9C100D750DC /* UIImage-NKDBarcode.h */,
+				03C096B41B70E9C100D750DC /* UIImage-Normalize.h */,
+			);
+			path = barEncodeArmv7s;
+			sourceTree = "<group>";
+		};
+		03C096B51B70E9C100D750DC /* libqrencode */ = {
+			isa = PBXGroup;
+			children = (
+				03C096B61B70E9C100D750DC /* bitstream.h */,
+				03C096B71B70E9C100D750DC /* mask.h */,
+				03C096B81B70E9C100D750DC /* QRCodeGenerator.h */,
+				03C096B91B70E9C100D750DC /* qrencode.h */,
+				03C096BA1B70E9C100D750DC /* qrinput.h */,
+				03C096BB1B70E9C100D750DC /* qrspec.h */,
+				03C096BC1B70E9C100D750DC /* rscode.h */,
+				03C096BD1B70E9C100D750DC /* split.h */,
+			);
+			path = libqrencode;
+			sourceTree = "<group>";
+		};
+		03C096BE1B70E9C100D750DC /* zbar */ = {
+			isa = PBXGroup;
+			children = (
+				03C096BF1B70E9C100D750DC /* Decoder.h */,
+				03C096C01B70E9C100D750DC /* Exception.h */,
+				03C096C11B70E9C100D750DC /* Image.h */,
+				03C096C21B70E9C100D750DC /* ImageScanner.h */,
+				03C096C31B70E9C100D750DC /* Processor.h */,
+				03C096C41B70E9C100D750DC /* Scanner.h */,
+				03C096C51B70E9C100D750DC /* Symbol.h */,
+				03C096C61B70E9C100D750DC /* Video.h */,
+				03C096C71B70E9C100D750DC /* Window.h */,
+			);
+			path = zbar;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		03C096741B70E67D00D750DC /* FNScanner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03C096891B70E67D00D750DC /* Build configuration list for PBXNativeTarget "FNScanner" */;
+			buildPhases = (
+				03C096711B70E67D00D750DC /* Sources */,
+				03C096721B70E67D00D750DC /* Frameworks */,
+				03C096731B70E67D00D750DC /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FNScanner;
+			productName = FNScanner;
+			productReference = 03C096751B70E67D00D750DC /* libFNScanner.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		03C0966D1B70E67D00D750DC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = "___Turbo___";
+				TargetAttributes = {
+					03C096741B70E67D00D750DC = {
+						CreatedOnToolsVersion = 6.3;
+					};
+				};
+			};
+			buildConfigurationList = 03C096701B70E67D00D750DC /* Build configuration list for PBXProject "FNScanner" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 03C0966C1B70E67D00D750DC;
+			productRefGroup = 03C096761B70E67D00D750DC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				03C096741B70E67D00D750DC /* FNScanner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		03C096711B70E67D00D750DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03AD30711BCFB66A0099BECF /* UZCaptureVC.m in Sources */,
+				03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */,
+				03AD30721BCFB66A0099BECF /* UZCaptureView.m in Sources */,
+				03C096971B70E92F00D750DC /* UZFNBarViewController.m in Sources */,
+				03C096961B70E92F00D750DC /* FNScannerViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		03C096871B70E67D00D750DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					armv7s,
+				);
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		03C096881B70E67D00D750DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					armv7s,
+				);
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		03C0968A1B70E67D00D750DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		03C0968B1B70E67D00D750DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		03C096701B70E67D00D750DC /* Build configuration list for PBXProject "FNScanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03C096871B70E67D00D750DC /* Debug */,
+				03C096881B70E67D00D750DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		03C096891B70E67D00D750DC /* Build configuration list for PBXNativeTarget "FNScanner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03C0968A1B70E67D00D750DC /* Debug */,
+				03C0968B1B70E67D00D750DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 03C0966D1B70E67D00D750DC /* Project object */;
+}

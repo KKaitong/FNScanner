@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,width=device-width,initial-scale=1.0'/>
+        <title>聊天盒子</title>
+        <link rel='stylesheet' type='text/css' href='../css/bootstrap.min.css' />
+		<link rel='stylesheet' href='../css/github.css'>
+		<style type='text/css'>
+		  .diy-btn-group-test {margin : 10px 0px 0px 0px;}
+		</style>
+		
+    </head>
+    <body>
+    </body>
+	<script src="../script/jquery-1.11.1.min.js"></script>
+	<script src='../script/demo.js'></script>
+	<script src='../script/highlight.pack.js'></script>
+    <script type='text/javascript' src='../script/api.js'></script>
+    <script type='text/javascript'>
+    
+
+    function openview()
+    {
+		var obj = api.require('FNScanner');
+		obj.openScanner({
+			autorotation:true,
+		    autoLight: true,
+		    saveToAlbum: true,
+		    saveImg: {
+		        path: 'fs://barImage/hh.jpg',
+		        w: 400,
+		        h: 400
+		    }
+		}, function(ret,err) {
+				window.path = ret.savePath;
+			 if(ret){
+		        alert(JSON.stringify(ret));
+		     }
+		});
+    };
+    
+    function openDiyview()
+    {
+		var obj = api.require('FNScanner');
+		obj.openView({
+		    saveToAlbum: true,
+		    rect:{
+		    	x:50,
+		    	y:100,
+		    	w:300,
+		    	h:300
+		    },
+		    saveImg: {
+		        path: 'fs://barImage/hh.jpg',
+		        w: 400,
+		        h: 400
+		    },
+		    fixedOn:'main-con',
+		    fixed:true
+		}, function(ret,err) {
+		});
+    };
+    
+    function setFnsFrame()
+    {
+		var obj = api.require('FNScanner');
+		obj.setFrame({
+			   x: 50,
+			   y: 100,
+			   w: 400,
+			   h: 400
+		}, function(ret,err) {
+				window.path = ret.savePath;
+			 if(ret){
+		        alert(JSON.stringify(ret));
+		     }
+		});
+    };
+    
+    function decode(){
+    	var obj = api.require('FNScanner');
+		obj.decodeImg({
+		    path: 'fs://barImage/hh.jpg'
+		},function(ret,err){
+		    if(ret.status){
+		        alert(ret.content);
+		    }
+		});
+    }
+    
+    function encode(){
+    	var obj = api.require('FNScanner');
+		obj.encodeImg({
+			type:'bar_image',
+			content:'1234561890001',
+		    saveToAlbum: true,
+		    saveImg: {
+		        path: 'fs://barImage/hhh.jpg',
+		        w: 800,
+		        h: 800
+		    }
+		},function(ret,err){
+		   	if(ret){
+		        alert(JSON.stringify(ret));
+		     }
+		});
+    }
+    
+    function turnOn(){
+    	var obj = api.require('FNScanner');
+		obj.switchLight({
+			status: 'on'
+		});
+    }
+    
+    function turnOff(){
+    	var obj = api.require('FNScanner');
+		obj.switchLight({
+			status: 'off'
+		});
+    }
+    
+    function closeView(){
+    	var obj = api.require('FNScanner');
+		obj.closeView();
+    }
+    
+    </script>
+    
+   <body style="background:#FFF;">
+    <div id="wrap" style="background:#FFF;">
+        <div id="main"> 
+            <div  >
+            	<input type="button" onclick="openview()" value="显示" />
+            	<input type="button" onclick="openDiyview()" value="openDiyview" />
+            	<input type="button" onclick="setFnsFrame()" value="setFnsFrame" />
+            	<input type="button" onclick="decode()" value="decode" />
+            	<input type="button" onclick="encode()" value="encode" />
+            	<input type="button" onclick="turnOn()" value="turnOn" />
+            	<input type="button" onclick="turnOff()" value="turnOff" />
+            	<input type="button" onclick="closeView()" value="closeView" />
+            </div>
+
+        </div>   
+    </div>
+</body>
+    
+</html>
