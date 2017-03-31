@@ -9,8 +9,9 @@
 
 @interface UZCaptureView ()
 {
-    NSString *resultStr;
+    NSString *_resultStr;
 }
+    @property (nonatomic ,strong) NSString *resultStr;
 @end
 
 @implementation UZCaptureView
@@ -105,7 +106,7 @@
     if ([self.session canAddOutput:videoOutput]) {
         [self.session addOutput:videoOutput];
     }   AVAuthorizationStatus  cameraStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if (cameraStatus == AVAuthorizationStatusAuthorized) {
+    if (cameraStatus == AVAuthorizationStatusAuthorized || cameraStatus==AVAuthorizationStatusNotDetermined) {
         // 设置扫码支持的编码格式(如下设置条形码和二维码兼容) AVMetadataObjectTypeQRCode：二维码
         BOOL ios8 = [[[UIDevice currentDevice] systemVersion] floatValue]>=8.0?YES:NO;
         if (ios8) {
@@ -155,7 +156,7 @@
     getCodePicture = YES;
     if ([metadataObjects count] > 0) {
         AVMetadataMachineReadableCodeObject *metadataObject = [metadataObjects objectAtIndex:0];
-        resultStr = metadataObject.stringValue;
+        self.resultStr = metadataObject.stringValue;
     }
 }
 
@@ -165,7 +166,7 @@
     if (getCodePicture) {
         // 通过抽样缓存数据创建一个UIImage对象
         UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
-        [self.delegate didViewScan:image withResult:resultStr];
+        [self.delegate didViewScan:image withResult:self.resultStr];
         getCodePicture = NO;
     }
 }

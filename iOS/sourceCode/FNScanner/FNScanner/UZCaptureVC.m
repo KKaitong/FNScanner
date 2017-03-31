@@ -10,9 +10,10 @@
 @interface UZCaptureVC ()
 {
     BOOL getCodePicture;
-    NSString *resultStr;
+    NSString *_resultStr;
     UIImageView *_background;
 }
+    @property (nonatomic ,strong) NSString *resultStr;
 @end
 
 @implementation UZCaptureVC
@@ -170,15 +171,15 @@
         if ([device hasTorch] && [device hasFlash]) {
             [device lockForConfiguration:nil];
             if (btnlight.isSelected) {
-                [device setTorchMode:AVCaptureTorchModeOn];
-                [device setFlashMode:AVCaptureFlashModeOn];
-                [btnlight setSelected:NO];
-                [btnlight setBackgroundImage:[self getImage:@"light_light"] forState:UIControlStateNormal];
-            } else {
                 [device setTorchMode:AVCaptureTorchModeOff];
                 [device setFlashMode:AVCaptureFlashModeOff];
-                [btnlight setSelected:YES];
+                [btnlight setSelected:NO];
                 [btnlight setBackgroundImage:[self getImage:@"light"] forState:UIControlStateNormal];
+            } else {
+                [device setTorchMode:AVCaptureTorchModeOn];
+                [device setFlashMode:AVCaptureFlashModeOn];
+                [btnlight setSelected:YES];
+                [btnlight setBackgroundImage:[self getImage:@"light_light"] forState:UIControlStateNormal];
             }
             [device unlockForConfiguration];
         }
@@ -277,7 +278,7 @@
         [_session addOutput:videoOutput];
     }
     AVAuthorizationStatus  cameraStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if (cameraStatus == AVAuthorizationStatusAuthorized) {
+    if (cameraStatus==AVAuthorizationStatusAuthorized || cameraStatus==AVAuthorizationStatusNotDetermined) {
         // 设置扫码支持的编码格式(如下设置条形码和二维码兼容) AVMetadataObjectTypeQRCode：二维码
         BOOL ios8 = [[[UIDevice currentDevice] systemVersion] floatValue]>=8.0?YES:NO;
         if (ios8) {
@@ -302,7 +303,7 @@
     getCodePicture = YES;
     if ([metadataObjects count] > 0) {
         AVMetadataMachineReadableCodeObject *metadataObject = [metadataObjects objectAtIndex:0];
-        resultStr = metadataObject.stringValue;
+        self.resultStr = metadataObject.stringValue;
     }
 }
 
@@ -312,7 +313,9 @@
     if (getCodePicture) {
         // 通过抽样缓存数据创建一个UIImage对象
         UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
-        [self.delegate didScan:image withResult:resultStr];
+        if ([self.delegate respondsToSelector:@selector(didScan:withResult:)]) {
+            [self.delegate didScan:image withResult:self.resultStr];
+        }
         getCodePicture = NO;
         [_session stopRunning];
         [self performSelectorOnMainThread:@selector(dissmissVC) withObject:nil waitUntilDone:NO];
@@ -320,6 +323,7 @@
 }
 
 - (void)dissmissVC {
+    NSLog(@"dismissModalViewControllerAnimated");
     [self dismissModalViewControllerAnimated:YES];
 }
 

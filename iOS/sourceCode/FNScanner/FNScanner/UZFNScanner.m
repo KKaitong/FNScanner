@@ -407,7 +407,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark  CaptureViewDelegate
 #pragma mark-
-
+#pragma mark iOS7以后版本上打开的扫描view，扫描成功后的回调扫描的图片
 - (void)didViewScan:(UIImage *)image withResult:(NSString *)result {
     if (![result isKindOfClass:[NSString class]] || result.length==0) {
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -474,7 +474,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     [self.captureView.session stopRunning];
     [self performSelectorOnMainThread:@selector(restart) withObject:nil waitUntilDone:NO];
 }
-
+#pragma mark ios7以后的系统版本上打开的扫描view 扫描成功后刷新摄像头再开始进行扫描
 - (void)restart {
   [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(startScann) userInfo:nil repeats:NO];
 }
@@ -486,7 +486,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark  CaptureDelegate
 #pragma mark-
-
+#pragma mark iOS7以后版本上打开默认扫描器，扫描成功后的回调扫描的图片
 - (void)didScan:(UIImage *)image withResult:(NSString *)result {
     //播放声音,支持wav、aiff、caf格式
     if(self.openSound.length>0){
@@ -506,7 +506,6 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         UIImage *sclImg = [self imageByScalingToSize:imgSize image:image];
         [self writeImage:sclImg toFileAtPath:realPath];
     }
-    
     //保存图片到相册
     if (openSaveToAlbum) {
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -542,18 +541,18 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         }
     }
 }
-
+#pragma mark iOS7以后版本上打开的扫描view，打开本地相册识别图片
 - (void)openAlbum {
     [self openAlbum:nil];
 }
-
+#pragma mark iOS7以后版本上打开的扫描view，取消扫描
 - (void)cancelScan {
     [self cancel:nil];
 }
 #pragma mark-
 #pragma mark open imageDelegate
 #pragma mark-
-
+#pragma mark iOS6、7、8、9、10 用zbar识别图片失败的回调
 - (void)readerControllerDidFailToRead:(ZBarReaderController *)reader withRetry:(BOOL)retry {
     if(retry){
         //retry == 1 选择图片为非二维码。
@@ -564,7 +563,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         return;
     }
 }
-
+#pragma mark iOS6、7、8、9、10取消从相册选择图片识别
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissModalViewControllerAnimated:YES];
     isImageRead = NO;
@@ -574,7 +573,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark openScanner Delegate
 #pragma mark-
-
+#pragma mark iOS6、7、8、9、10从相册选择图片识别/////iOS7以下zbar扫码回调
 - (void)imagePickerController:(UIImagePickerController *)reader didFinishPickingMediaWithInfo:(NSDictionary *)info {//从相册/扫描器获取图片
     /*openAlbum 从相册读取*/
     if (isImageRead) {
@@ -671,15 +670,15 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark Scanner OrentationChangedDelegate
 #pragma mark-
-
+#pragma mark 右横屏
 - (void)changeToRight:(UZFNBarViewController *)reader {
     [self changedVertical];
 }
-
+#pragma mark 左横屏
 - (void)changeToLeft:(UZFNBarViewController *)reader {
     [self changedVertical];
 }
-
+#pragma mark 竖屏
 - (void)changeToPortrait:(UZFNBarViewController *)reader {
     float width = [UIScreen mainScreen].bounds.size.width;
     float height = [UIScreen mainScreen].bounds.size.height;
@@ -704,7 +703,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     UIButton *aubumButton12 = (UIButton *)[_background viewWithTag:688];
     [aubumButton12 setFrame:CGRectMake(width/2-30, 30,45, 42)];
 }
-
+#pragma mark 横屏
 - (void)changedVertical {
     float width = [UIScreen mainScreen].bounds.size.width;
     float height = [UIScreen mainScreen].bounds.size.height;
@@ -812,19 +811,13 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark helper
 #pragma mark -
-
+#pragma mark取消
 - (void)cancel:(UIButton *)sender {
     [self.viewController dismissModalViewControllerAnimated:YES];
     NSDictionary *sendDict = [NSDictionary dictionaryWithObject:@"cancel" forKey:@"eventType"];
     [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
 }
-
-- (UIImage *)getImage:(NSString *)fileName {
-    NSString *pathName = [NSString stringWithFormat:@"res_FNScanner/%@",fileName];
-    NSString *path = [[NSBundle mainBundle] pathForResource:pathName ofType:@"png"];
-    return [UIImage imageWithContentsOfFile:path];
-}
-
+#pragma mark从相册读取图片解码
 - (void)openAlbum:(UIButton *)btn {//从相册读取图片解码
     [self.viewController dismissModalViewControllerAnimated:NO];
     NSDictionary *sendDict = [NSDictionary dictionaryWithObject:@"selectImage" forKey:@"eventType"];
@@ -832,7 +825,13 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     isImageRead = YES;
     [self presentImagePicker];
 }
-//闪光灯开关
+#pragma mark工具函数
+- (UIImage *)getImage:(NSString *)fileName {
+    NSString *pathName = [NSString stringWithFormat:@"res_FNScanner/%@",fileName];
+    NSString *path = [[NSBundle mainBundle] pathForResource:pathName ofType:@"png"];
+    return [UIImage imageWithContentsOfFile:path];
+}
+#pragma mark 闪光灯开关
 - (void) turnTorchOn:(UIButton *)btntemp {
     UIView *superView = [btntemp superview];
     UIButton *btnlight = (UIButton *)[superView viewWithTag:789];
@@ -941,7 +940,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         [self sendResultEventWithCallbackId:callBackDecode dataDict:sendDict errDict:nil doDelete:YES];
     }
 }
-
+#pragma mark 保存图片到指定路径
 - (BOOL)writeImage:(UIImage*)image toFileAtPath:(NSString*)aPath {//保存图片到指定路径
     if ((image == nil) || (aPath == nil) || ([aPath isEqualToString:@""])) {
         return NO;
@@ -974,7 +973,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     }
     return NO;
 }
-
+#pragma mark 调整图片大小
 - (UIImage *)imageByScalingToSize:(CGSize)targetSize image:(UIImage *)sourceImage {
     UIImage *newImage = nil;
     CGSize imageSize = sourceImage.size;
