@@ -17,6 +17,7 @@
 package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera;
 
 import java.io.IOException;
+
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -40,6 +41,10 @@ public final class CameraManager {
 
 	private static final String TAG = CameraManager.class.getSimpleName();
 	private static CameraManager cameraManager;
+	private static final int MIN_FRAME_WIDTH = 240;
+	private static final int MIN_FRAME_HEIGHT = 240;
+	private static final int MAX_FRAME_WIDTH = 480;
+	private static final int MAX_FRAME_HEIGHT = 360;
 
 	static final int SDK_INT; // Later we can use Build.VERSION.SDK_INT
 	static {
@@ -254,26 +259,27 @@ public final class CameraManager {
 				int topOffset = (screenResolution.y - height) / 3;
 				framingRect = new Rect(leftOffset, topOffset, leftOffset
 						+ width, topOffset + height);
+
+				// 原生
+//				int width = screenResolution.x * 3 / 4;
+//				if (width < MIN_FRAME_WIDTH) {
+//					width = MIN_FRAME_WIDTH;
+//				} else if (width > MAX_FRAME_WIDTH) {
+//					width = MAX_FRAME_WIDTH;
+//				}
+//				int height = screenResolution.y * 3 / 4;
+//				if (height < MIN_FRAME_HEIGHT) {
+//					height = MIN_FRAME_HEIGHT;
+//				} else if (height > MAX_FRAME_HEIGHT) {
+//					height = MAX_FRAME_HEIGHT;
+//				}
+//				int leftOffset = (screenResolution.x - width) / 2;
+//				int topOffset = (screenResolution.y - height) / 2;
+//				framingRect = new Rect(leftOffset, topOffset, leftOffset
+//						+ width, topOffset + height);
+				Log.d(TAG, "Calculated framing rect: " + framingRect);
 			}
 
-			// 原生
-			// int width = screenResolution.x * 3 / 4;
-			// if (width < MIN_FRAME_WIDTH) {
-			// width = MIN_FRAME_WIDTH;
-			// } else if (width > MAX_FRAME_WIDTH) {
-			// width = MAX_FRAME_WIDTH;
-			// }
-			// int height = screenResolution.y * 3 / 4;
-			// if (height < MIN_FRAME_HEIGHT) {
-			// height = MIN_FRAME_HEIGHT;
-			// } else if (height > MAX_FRAME_HEIGHT) {
-			// height = MAX_FRAME_HEIGHT;
-			// }
-			// int leftOffset = (screenResolution.x - width) / 2;
-			// int topOffset = (screenResolution.y - height) / 2;
-			// framingRect = new Rect(leftOffset, topOffset, leftOffset + width,
-			// topOffset + height);
-			Log.d(TAG, "Calculated framing rect: " + framingRect);
 		}
 		return framingRect;
 	}
@@ -287,18 +293,18 @@ public final class CameraManager {
 			Rect rect = new Rect(getFramingRect());
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getScreenResolution();
-			// rect.left = rect.left * cameraResolution.x / screenResolution.x;
-			// rect.right = rect.right * cameraResolution.x /
-			// screenResolution.x;
-			// rect.top = rect.top * cameraResolution.y / screenResolution.y;
-			// rect.bottom = rect.bottom * cameraResolution.y /
-			// screenResolution.y;
+//			rect.left = rect.left * cameraResolution.x / screenResolution.x;
+//			rect.right = rect.right * cameraResolution.x / screenResolution.x;
+//			rect.top = rect.top * cameraResolution.y / screenResolution.y;
+//			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
 
 			// 竖屏
-			rect.left = rect.left * cameraResolution.y / screenResolution.x;
-			rect.right = rect.right * cameraResolution.y / screenResolution.x;
-			rect.top = rect.top * cameraResolution.x / screenResolution.y;
-			rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
+			 rect.left = rect.left * cameraResolution.y / screenResolution.x;
+			 rect.right = rect.right * cameraResolution.y /
+			 screenResolution.x;
+			 rect.top = rect.top * cameraResolution.x / screenResolution.y;
+			 rect.bottom = rect.bottom * cameraResolution.x /
+			 screenResolution.y;
 
 			framingRectInPreview = rect;
 		}

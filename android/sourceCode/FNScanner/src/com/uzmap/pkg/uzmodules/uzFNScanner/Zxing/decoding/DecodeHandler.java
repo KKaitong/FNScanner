@@ -53,15 +53,17 @@ final class DecodeHandler extends Handler {
 	public void handleMessage(Message message) {
 		int decode = UZResourcesIDFinder.getResIdID("fn_decode");
 		int quit = UZResourcesIDFinder.getResIdID("fn_quit");
-		
-		if (message.what==decode) {
+
+		if (message.what == decode) {
 			// Log.d(TAG, "Got decode message");
+			int width = message.arg1;
+			int heigth = message.arg2;
 			decode((byte[]) message.obj, message.arg1, message.arg2);
-		}else if (message.what==quit) {
+		} else if (message.what == quit) {
 			Looper.myLooper().quit();
 
 		}
-		
+
 	}
 
 	/**
@@ -79,17 +81,17 @@ final class DecodeHandler extends Handler {
 	private void decode(byte[] data, int width, int height) {
 		long start = System.currentTimeMillis();
 		Result rawResult = null;
-		
-		byte[] rotatedData = new byte[data.length]; 
-		 for (int y = 0; y < height; y++) { 
-		 for (int x = 0; x < width; x++) 
-		 rotatedData[x * height + height - y - 1] = data[x + y * width]; 
-		 } 
-		 int tmp = width; // Here we are swapping, that's the difference to #11 
-		 width = height; 
-		 height = tmp; 
-		 data = rotatedData; 
-		
+
+		byte[] rotatedData = new byte[data.length];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++)
+				rotatedData[x * height + height - y - 1] = data[x + y * width];
+		}
+		int tmp = width; // Here we are swapping, that's the difference to #11
+		width = height;
+		height = tmp;
+		data = rotatedData;
+
 		PlanarYUVLuminanceSource source = CameraManager.get()
 				.buildLuminanceSource(data, width, height);
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
@@ -99,6 +101,7 @@ final class DecodeHandler extends Handler {
 			// continue
 		} finally {
 			multiFormatReader.reset();
+			bitmap = null;
 		}
 
 		if (rawResult != null) {

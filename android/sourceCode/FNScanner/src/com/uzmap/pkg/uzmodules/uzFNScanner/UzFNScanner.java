@@ -87,8 +87,8 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	}
 
 	public void jsmethod_closeView(UZModuleContext moduleContext) {
-		removePreView();
 		destroyCamera();
+		removePreView();
 	}
 
 	public void jsmethod_decodeImg(UZModuleContext moduleContext) {
@@ -439,8 +439,9 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 
 	private void removePreView() {
 		if (mCaptureView != null) {
-			removeViewFromCurWindow(mCaptureView);
 			mCaptureView.onPause();
+			mCaptureView.onDestroy();
+			removeViewFromCurWindow(mCaptureView);
 			mCaptureView = null;
 		}
 	}
@@ -477,14 +478,8 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	}
 
 	protected void onClean() {
-		if (mCaptureView != null) {
-			mCaptureView.onPause();
-			mCaptureView = null;
-		}
-		if (mCamera != null) {
-			mCamera.release();
-			mCamera = null;
-		}
+		destroyCamera();
+		removePreView();
 		if (mSurfaceView != null) {
 			removeViewFromCurWindow(mSurfaceView);
 			mSurfaceView = null;

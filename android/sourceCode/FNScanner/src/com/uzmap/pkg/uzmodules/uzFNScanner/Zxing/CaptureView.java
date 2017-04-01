@@ -112,8 +112,9 @@ public class CaptureView extends FrameLayout implements Callback {
 
 	private void initCamera(SurfaceHolder surfaceHolder) {
 		try {
-			CameraManager.get().openDriver(surfaceHolder, getWidth(),
-					getHeight());
+			int width = 1920;
+			int heigth = 1080;
+			CameraManager.get().openDriver(surfaceHolder, width, heigth);
 			CameraManager.get().setScreemOrientation(90);
 		} catch (IOException ioe) {
 			return;

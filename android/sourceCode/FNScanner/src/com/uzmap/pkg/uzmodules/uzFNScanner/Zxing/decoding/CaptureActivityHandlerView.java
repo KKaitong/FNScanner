@@ -63,7 +63,6 @@ public final class CaptureActivityHandlerView extends Handler {
 		restartPreviewAndDecode();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void handleMessage(Message message) {
 		int auto_focus = UZResourcesIDFinder.getResIdID("fn_auto_focus");

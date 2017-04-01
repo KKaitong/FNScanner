@@ -54,16 +54,16 @@ final class CameraConfigurationManager {
 				+ previewFormatString);
 		screenResolution = new Point(w, h);
 		Log.d(TAG, "Screen resolution: " + screenResolution);
-		Point screenResolutionForCamera = new Point();
-		screenResolutionForCamera.x = screenResolution.x;
-		screenResolutionForCamera.y = screenResolution.y;
-		if (screenResolution.x < screenResolution.y) {
-			screenResolutionForCamera.x = screenResolution.y;
-			screenResolutionForCamera.y = screenResolution.x;
-		}
-		cameraResolution = getCameraResolution(parameters,
-				screenResolutionForCamera);
-		// cameraResolution = getCameraResolution(parameters, screenResolution);
+//		Point screenResolutionForCamera = new Point();
+//		screenResolutionForCamera.x = screenResolution.x;
+//		screenResolutionForCamera.y = screenResolution.y;
+//		if (screenResolution.x < screenResolution.y) {
+//			screenResolutionForCamera.x = screenResolution.y;
+//			screenResolutionForCamera.y = screenResolution.x;
+//		}
+//		cameraResolution = getCameraResolution(parameters,
+//				screenResolutionForCamera);
+		cameraResolution = getCameraResolution(parameters, screenResolution);
 		Log.d(TAG, "Camera resolution: " + screenResolution);
 	}
 
@@ -82,7 +82,7 @@ final class CameraConfigurationManager {
 				+ "  cameraResolution.y" + cameraResolution.y);
 		setFlash(parameters);
 		setZoom(parameters);
-		// camera.setDisplayOrientation(90);
+		camera.setDisplayOrientation(90);
 		// setDisplayOrientation(camera, 90);
 		// setSharpness(parameters);
 		camera.setParameters(parameters);
