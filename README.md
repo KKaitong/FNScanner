@@ -45,10 +45,6 @@ FNScanner 模块是一个二维码/条形码扫描器，是 scanner 模块的优
 
 通过 openView 接口打开一个自定义大小的扫描区域（本区域相当于打开一个 frame）进行扫描。开发者可自行 open 一个 frame 贴在模块上，从而实现自定义扫描界面的功能。然后配合使用 setFrame、closeView、switchLight 等接口实现开关闪光灯、重设扫描界面位置大小、图片解码、字符串编码等相关功能。详情请参考模块接口参数。
 
-<img src="https://docs.apicloud.com/img/docImage/module-doc-img/ext/FNScanner/FNScanner1.PNG"/>
-
-***该模块源码已开源，地址：https://github.com/apicloudcom/FNScanner***
-
 
 注意：
 
