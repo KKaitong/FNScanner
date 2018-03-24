@@ -4,5 +4,6 @@
 		    name:'FNScanner',
 		    class:'com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner'
 		}
+		
 	]
 }

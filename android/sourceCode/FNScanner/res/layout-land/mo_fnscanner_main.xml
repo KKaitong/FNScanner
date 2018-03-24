@@ -11,13 +11,13 @@
 
     <com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.view.ViewfinderView
         android:id="@+id/mo_fnscanner_viewfinder_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@drawable/header_bg" >
+        android:background="@drawable/mo_fnscanner_heaer_bg" >
 
         <ImageView
             android:id="@+id/mo_fnscanner_back"

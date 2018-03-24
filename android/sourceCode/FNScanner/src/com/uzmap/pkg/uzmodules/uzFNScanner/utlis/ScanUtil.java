@@ -60,8 +60,9 @@ public class ScanUtil {
 		}
 		if (null != bitmap) {
 			if (isSaveToAlbum) {
-				File file = makeSaveFile(albumPath());
+				File file = makeSaveFile(albumPath());///storage/emulated/0/DCIM/Camera/1504526279180.jpg
 //				storeToPath(fileOutputStream, bitmap, albumPath(), file);
+				storeToPath(fileOutputStream, bitmap, ScanUtil.ALBUM_IMG_PATH, file);
 				showInCamera(context, bitmap, file);
 			}
 			if (!TextUtils.isEmpty(savePath)) {
@@ -75,6 +76,8 @@ public class ScanUtil {
 	}
 
 	public static void showInCamera(Context context, Bitmap bitmap, File file) {
+		if(file == null)
+			return;
 		MediaStore.Images.Media.insertImage(context.getContentResolver(),
 				bitmap, file.getName(), "");
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -266,7 +269,7 @@ public class ScanUtil {
 		String path = Environment
 				.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
 				+ "/Camera/" + System.currentTimeMillis() + ".jpg";
-		ALBUM_IMG_PATH = path;
+		ALBUM_IMG_PATH = path;///storage/emulated/0/DCIM/Camera/1504526182644.jpg
 		return new File(path).getAbsolutePath();
 	}
 
@@ -280,7 +283,7 @@ public class ScanUtil {
 			}
 		}
 		File mediaFile = new File(mediaStorageDir.getPath() + File.separator
-				+ getImgName(filePath));
+				+ getImgName(filePath));///storage/emulated/0/DCIM/Camera/1504526084685.jpg
 		return mediaFile;
 	}
 

@@ -25,5 +25,6 @@
 @property (nonatomic, assign) id <CaptureViewDelegate> delegate;
 @property (nonatomic, assign) BOOL getCodePicture;
 @property (nonatomic, assign) BOOL autoFit;
+@property (nonatomic, assign) CGRect interestRect;
 
 @end

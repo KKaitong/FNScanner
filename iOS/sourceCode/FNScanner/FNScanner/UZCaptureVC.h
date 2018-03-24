@@ -27,4 +27,8 @@
 @property (nonatomic, assign) id <CaptureDelegate> delegate;
 @property (nonatomic, assign) BOOL autoFit;
 
+- (void)cancel:(UIButton *)sender;
+- (void)openAlbum:(UIButton *)btn;
+- (void)setupCamera;
+
 @end

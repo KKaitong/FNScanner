@@ -53,11 +53,9 @@ public final class CaptureActivityHandler extends Handler {
 		PREVIEW, SUCCESS, DONE
 	}
 
-	public CaptureActivityHandler(CaptureActivity activity,
-			Vector<BarcodeFormat> decodeFormats, String characterSet) {
+	public CaptureActivityHandler(CaptureActivity activity, Vector<BarcodeFormat> decodeFormats, String characterSet) {
 		this.activity = activity;
-		decodeThread = new DecodeThread(activity, decodeFormats, characterSet,
-				new ViewfinderResultPointCallback(activity.getViewfinderView()));
+		decodeThread = new DecodeThread(activity, decodeFormats, characterSet, new ViewfinderResultPointCallback());
 		decodeThread.start();
 		state = State.SUCCESS;
 
@@ -107,8 +105,7 @@ public final class CaptureActivityHandler extends Handler {
 			// We're decoding as fast as possible, so when one decode fails,
 			// start another.
 			state = State.PREVIEW;
-			CameraManager.get().requestPreviewFrame(decodeThread.getHandler(),
-					decode);
+			CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), decode);
 		} else if (message.what == return_scan_result) {
 			Log.d(TAG, "Got return scan result message");
 			activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
@@ -151,8 +148,7 @@ public final class CaptureActivityHandler extends Handler {
 
 		if (state == State.SUCCESS) {
 			state = State.PREVIEW;
-			CameraManager.get().requestPreviewFrame(decodeThread.getHandler(),
-					decode);
+			CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), decode);
 			CameraManager.get().requestAutoFocus(this, auto_focus);
 		}
 	}

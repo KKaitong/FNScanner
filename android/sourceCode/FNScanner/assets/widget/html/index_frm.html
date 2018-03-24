@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>WinA</title>
+    <link rel="stylesheet" type="text/css" href="css/api.css" />
+    <link rel="stylesheet" type="text/css" href="css/box.css" />
+    <script type="text/javascript" src="script/public.js"></script>
+    <style>
+    	p{
+    		color:#999;
+    		padding:5px;
+    	}
+    </style>
+	<script type="text/javascript">
+	
+	apiready = function() {
+		var FNScanner = api.require('FNScanner');
+	}
+	    
+		function openScanner() {
+		var obj = api.require('FNScanner');
+		obj.openScanner({
+			autorotation:true,
+			sound:'fs://6156.wav',
+		    autoLight: true,
+		    saveToAlbum: true,
+		    saveImg: {
+		        path: 'fs://barImage/hh.jpg',
+		        w: 600,
+		        h: 400
+		    }
+		}, function(ret,err) {
+				alert(JSON.stringify(ret));
+				alert(JSON.stringify(err));
+		});
+    };
+    
+    function openView() {
+		var obj = api.require('FNScanner');
+		obj.openView({
+			autorotation:true,
+			sound:'widget://res/unlock.wav',
+		    saveToAlbum: true,
+		    rect:{
+		    	x:0,
+		    	y:200,
+		    	w:400,
+		    	h:300
+		    },
+		    saveImg: {
+		        path: 'fs://barImage/hh.jpg',
+		        w: 400,
+		        h: 400
+		    }
+		}, function(ret,err) {
+				alert(JSON.stringify(ret));
+				alert(JSON.stringify(err));
+		});
+    };
+    
+    function setFrame() {
+		var obj = api.require('FNScanner');
+		obj.setFrame({
+			   x: 50,
+			   y: 200,
+			   w: 400,
+			   h: 400
+		}, function(ret,err) {
+				window.path = ret.savePath;
+			 if(ret){
+		        alert(JSON.stringify(ret));
+		     }
+		});
+    };
+    
+    function decodeImg(){
+    	var obj = api.require('FNScanner');
+		obj.decodeImg({
+			//sound: 'fs://6156.wav',
+		    //path: 'fs://barImage/hh.jpg'
+		},function(ret,err){
+				alert(JSON.stringify(ret));
+				alert(JSON.stringify(err));
+		});
+    }
+    
+    function encodeImg(){
+    	var obj = api.require('FNScanner');
+		obj.encodeImg({
+			type:'bar_image',
+			content:'1234561890001',
+		    saveToAlbum: true,
+		    saveImg: {
+		        path: 'fs://barImage/hhh.jpg',
+		        w: 800,
+		        h: 800
+		    }
+		},function(ret,err){
+				alert(JSON.stringify(ret));
+				alert(JSON.stringify(err));
+		});
+    }
+    
+    function switchLightOn(){
+    	var obj = api.require('FNScanner');
+		obj.switchLight({
+			status: 'on'
+		});
+    }
+    
+    function switchLightOff(){
+    	var obj = api.require('FNScanner');
+		obj.switchLight({
+			status: 'off'
+		});
+    }
+    
+    function closeView(){
+    	var obj = api.require('FNScanner');
+		obj.closeView();
+    }
+		
+	</script>
+</head>
+<body>
+    <div id="wrap">
+        <div id="main" style='margin-top:250px;'>
+        	<br>
+				<div class="clickbtn" tapmode="active" onclick="openScanner()" >openScanner</div>
+				<div class="clickbtn" tapmode="active" onclick="openView()" >openView</div>
+				<div class="clickbtn" tapmode="active" onclick="setFrame()" >setFrame</div>
+				<div class="clickbtn" tapmode="active" onclick="decodeImg()" >decodeImg</div>
+				<div class="clickbtn" tapmode="active" onclick="encodeImg()" >encodeImg</div>
+				<div class="clickbtn" tapmode="active" onclick="switchLightOn()" >switchLightOn</div>
+				<div class="clickbtn" tapmode="active" onclick="decodeImg()" >switchLightOff</div>
+				<div class="clickbtn" tapmode="active" onclick="closeView()" >closeView</div>
+			<br>
+		</div>
+	</div>
+</body>
+</html>

@@ -16,10 +16,12 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AbsoluteLayout;
 import android.widget.FrameLayout;
@@ -31,6 +33,7 @@ import com.uzmap.pkg.uzcore.UZWebView;
 import com.uzmap.pkg.uzcore.uzmodule.UZModule;
 import com.uzmap.pkg.uzcore.uzmodule.UZModuleContext;
 import com.uzmap.pkg.uzkit.UZUtility;
+import com.uzmap.pkg.uzkit.data.UZWidgetInfo;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureActivity;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureView;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.CameraManager;
@@ -55,6 +58,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	private int mOrientation = 0;
 	private OrientationEventListener mOrientationListener;
 	private boolean mIsOrientation = false;
+	public static boolean isWindow = false;
 
 	public UzFNScanner(UZWebView webView) {
 		super(webView);
@@ -62,17 +66,33 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 
 	public void jsmethod_openScanner(UZModuleContext moduleContext) {
 		mModuleContext = moduleContext;
+		isWindow = false;
+		callBack(moduleContext);//remove by cameracheck at 2017年9月1日17:51:31
 		mJsParamsUtil = JsParamsUtil.getInstance();
 		stopCamera();
 		Intent intent = new Intent(getContext(), CaptureActivity.class);
 		initIntentParams(moduleContext, intent);
+		intent.putExtra("isNewUI", false);
 		startActivityForResult(this, intent, OPEN_CODE);
-		callBack(moduleContext);
+	}
+	
+	public void jsmethod_open(UZModuleContext moduleContext) {
+		mModuleContext = moduleContext;
+		isWindow = false;
+		callBack(moduleContext);//remove by cameracheck at 2017年9月1日17:51:31
+		mJsParamsUtil = JsParamsUtil.getInstance();
+		stopCamera();
+		Intent intent = new Intent(getContext(), CaptureActivity.class);
+		initIntentParams(moduleContext, intent);
+		intent.putExtra("isNewUI", true);
+		startActivityForResult(this, intent, OPEN_CODE);
 	}
 
 	public void jsmethod_openView(UZModuleContext moduleContext) {
+		mModuleContext = moduleContext;
+		isWindow = true;
 		mJsParamsUtil = JsParamsUtil.getInstance();
-		callBack(moduleContext);
+		callBack(moduleContext);//remove by cameracheck at 2017年9月1日17:51:31
 		openDIYScanner(moduleContext);
 		mIsOrientation = moduleContext.optBoolean("autorotation", false);
 		if (mIsOrientation) {
@@ -107,11 +127,22 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		String savePath = encode(moduleContext);
 		encodeCallBack(moduleContext, savePath, ScanUtil.ALBUM_IMG_PATH);
 	}
-
+	
 	public void jsmethod_switchLight(UZModuleContext moduleContext) {
 		mJsParamsUtil = JsParamsUtil.getInstance();
-		CameraManager.init(mContext);
+		//CameraManager.init(mContext);
 		switchLight(moduleContext);
+	}
+	
+	public void jsmethod_onResume(UZModuleContext moduleContext) {
+		if(mCaptureView!= null){
+			mCaptureView.onResume();
+		}
+	}
+	public void jsmethod_onPause(UZModuleContext moduleContext) {
+		if(mCaptureView!= null){
+			mCaptureView.onPause();
+		}
 	}
 
 	private void callBack(UZModuleContext moduleContext) {
@@ -161,7 +192,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		if (isTurnOn) {
 			if (mCaptureView == null) {
 				if (mCamera == null) {
-					mCamera = Camera.open();
+						mCamera = Camera.open();
 				}
 				Camera.Parameters mparameter = mCamera.getParameters();
 				mparameter.setFlashMode("torch");
@@ -254,9 +285,10 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		mCaptureView = new CaptureView(mContext, this, moduleContext);
 	}
 
-	private void insertCaptureView(UZModuleContext moduleContext) {
+	public void insertCaptureView(UZModuleContext moduleContext) {
 		String fixedOn = moduleContext.optString("fixedOn");
 		boolean fixed = moduleContext.optBoolean("fixed", true);
+		
 		insertViewToCurWindow(mCaptureView, captureViewLayout(moduleContext),
 				fixedOn, fixed);
 	}
@@ -266,9 +298,8 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		int x = mJsParamsUtil.x(moduleContext);
 		int y = mJsParamsUtil.y(moduleContext);
 		int width = mJsParamsUtil.w(moduleContext, mContext);
-		int height = mJsParamsUtil.h(moduleContext, mContext);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-				width, height);
+		int height = mJsParamsUtil.h(moduleContext, mContext, this);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
 		params.setMargins(x, y, 0, 0);
 		return params;
 	}
@@ -324,6 +355,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == Activity.RESULT_OK) {
+			callBack(mModuleContext);
 			switch (requestCode) {
 			case OPEN_CODE:
 				onOpenParseResult(data);
@@ -450,7 +482,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	public void surfaceCreated(SurfaceHolder holder) {
 		try {
 			if (mCamera == null) {
-				mCamera = Camera.open();
+					mCamera = Camera.open();
 			}
 			mCamera.setPreviewDisplay(mSurfaceHolder);
 		} catch (Exception e) {
@@ -519,13 +551,13 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		int rotation = mContext.getWindowManager().getDefaultDisplay()
 				.getRotation();
 		switch (rotation) {
-		case Surface.ROTATION_0:// 上
+		case Surface.ROTATION_0:// 涓�
 			return 90;
-		case Surface.ROTATION_90:// 左
+		case Surface.ROTATION_90:// 宸�
 			return 0;
-		case Surface.ROTATION_180:// 下
+		case Surface.ROTATION_180:// 涓�
 			return 270;
-		case Surface.ROTATION_270:// 右
+		case Surface.ROTATION_270:// 鍙�
 			return 180;
 		}
 		return 0;
@@ -569,4 +601,16 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 			CameraManager.get().setScreemOrientation(angle);
 	}
 
+	public void checkOpenCameraCallback(CaptureView captureView){
+		if(mModuleContext != null){
+			JSONObject ret = new JSONObject();
+			try {
+				ret.put("eventType", "cameraError");
+				mModuleContext.success(ret, false);
+			} catch (JSONException e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
+	
 }

@@ -18,6 +18,7 @@
 #import "AssetsLibrary/AssetsLibrary.h"
 #import "UZCaptureVC.h"
 #import "UZCaptureView.h"
+#import "UZCaptureNewVC.h"
 
 #define ZBarOrientationMaskNormal \
 (ZBarOrientationMask(UIInterfaceOrientationPortrait) | \
@@ -101,6 +102,37 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark interface
 #pragma mark-
 
+- (void)onResume:(NSDictionary *)paramsDict_ {
+}
+- (void)onPause:(NSDictionary *)paramsDict_ {}
+
+- (void)open:(NSDictionary *)paramsDict_ {
+    self.openSaveInfo = [paramsDict_ dictValueForKey:@"saveImg" defaultValue:@{}];
+    callOpenId = [paramsDict_ integerValueForKey:@"cbId" defaultValue:-1];
+    callBackFail = callOpenId;
+    NSString *soundStr = [paramsDict_ stringValueForKey:@"sound" defaultValue:nil];
+    if ([soundStr isKindOfClass:[NSString class]] && soundStr.length>0) {
+        self.openSound = [self getPathWithUZSchemeURL:soundStr];
+    }
+    BOOL autoLight = NO;
+    BOOL autorotaion = [paramsDict_ boolValueForKey:@"autorotation" defaultValue:NO];
+    openSaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
+    if (isIOS7) {
+        if (![self canUseCamera]) {
+            [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"cameraError"} errDict:nil doDelete:NO];
+            return;
+        }
+        UZCaptureNewVC *capture = [[UZCaptureNewVC alloc]init];
+        capture.delegate = self;
+        capture.autoFit = autorotaion;
+        [self.viewController presentViewController:capture animated:YES completion:^(){
+            NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
+            [sendDict setObject:@"show" forKey:@"eventType"];
+            [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:NO];
+        }];
+    }
+}
+
 - (void)openScanner:(NSDictionary *)paramsDict_ {
     self.openSaveInfo = [paramsDict_ dictValueForKey:@"saveImg" defaultValue:@{}];
     callOpenId = [paramsDict_ integerValueForKey:@"cbId" defaultValue:-1];
@@ -113,6 +145,10 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     BOOL autorotaion = [paramsDict_ boolValueForKey:@"autorotation" defaultValue:NO];
     openSaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
     if (isIOS7) {
+        if (![self canUseCamera]) {
+            [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"cameraError"} errDict:nil doDelete:NO];
+            return;
+        }
         UZCaptureVC *capture = [[UZCaptureVC alloc]init];
         capture.delegate = self;
         capture.autoFit = autorotaion;
@@ -246,11 +282,24 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     diySaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
 
     if (isIOS7) {
+        if (![self canUseCamera]) {
+            [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@"cameraError"} errDict:nil doDelete:NO];
+            return;
+        }
         self.captureView = [[UZCaptureView alloc]init];
         self.captureView.frame = CGRectMake(x, y, w, h);
         self.captureView.delegate = self;
         self.captureView.autoFit = autorotation;
+        
+        NSDictionary *rectOfInterest = [paramsDict_ dictValueForKey:@"rectOfInterest" defaultValue:@{}];
+        float interestx = [rectOfInterest floatValueForKey:@"x" defaultValue:0];
+        float interesty = [rectOfInterest floatValueForKey:@"y" defaultValue:0];
+        float interestw = [rectOfInterest floatValueForKey:@"w" defaultValue:w];
+        float interesth = [rectOfInterest floatValueForKey:@"h" defaultValue:h];
+        CGRect interestRect = CGRectMake(interestx, interesty, interestw, interesth);
+        self.captureView.interestRect = interestRect;
         [self addSubview:captureView fixedOn:fixedOn fixed:fixed];
+    
         //回调
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
         [sendDict setObject:@"show" forKey:@"eventType"];
@@ -315,6 +364,10 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         [self decodeFromImage:image];
     } else {
         isDecodeImg = YES;
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:callBackDecode dataDict:@{@"status":@(NO)} errDict:@{@"code":@(2)} doDelete:NO];
+            return;
+        }
         [self presentImagePicker];
     }
 }
@@ -355,22 +408,27 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     }
     //保存图片到相册
     if (saveToAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
-            if (error) {
-                NSLog(@"Turbo FNScanner save image error");
-            }
-            NSString *imgUrl = [assetURL absoluteString];
-            NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
-            [sendDict setObject:[NSNumber numberWithBool:YES] forKey:@"status"];
-            if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
-                [sendDict setObject:realPath forKey:@"imgPath"];
-            }
-            if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
-                [sendDict setObject:imgUrl forKey:@"albumPath"];
-            }
-            [self sendResultEventWithCallbackId:cbid dataDict:sendDict errDict:nil doDelete:YES];
-        }];
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:cbid dataDict:@{@"status":@(NO)} errDict:@{@"code":@(2)} doDelete:NO];
+            return;
+        }else {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
+                if (error) {
+                    NSLog(@"Turbo FNScanner save image error");
+                }
+                NSString *imgUrl = [assetURL absoluteString];
+                NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
+                [sendDict setObject:[NSNumber numberWithBool:YES] forKey:@"status"];
+                if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
+                    [sendDict setObject:realPath forKey:@"imgPath"];
+                }
+                if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
+                    [sendDict setObject:imgUrl forKey:@"albumPath"];
+                }
+                [self sendResultEventWithCallbackId:cbid dataDict:sendDict errDict:nil doDelete:YES];
+            }];
+        }
     } else {
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
         [sendDict setObject:[NSNumber numberWithBool:YES] forKey:@"status"];
@@ -416,7 +474,11 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         return;
     }
     if ([result canBeConvertedToEncoding:NSShiftJISStringEncoding]){
-        result = [NSString stringWithCString:[result cStringUsingEncoding:NSShiftJISStringEncoding] encoding:NSUTF8StringEncoding];
+        const char *shiftjisstring = [result cStringUsingEncoding:NSShiftJISStringEncoding];
+        NSString *resultutf8 = [NSString stringWithCString:shiftjisstring encoding:NSUTF8StringEncoding];
+        if (resultutf8 && [resultutf8 isKindOfClass:[NSString class]]) {
+            result = resultutf8;
+        }
     }
     //播放声音
     if(self.diySound.length>0){
@@ -439,26 +501,32 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     
     //保存图片到相册
     if (diySaveToAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
-            if (error) {
-                NSLog(@"Turbo FNScanner save diyscanner image error");
-            }
-            NSString *imgUrl = [assetURL absoluteString];
-            //diy扫码成功的回调
-            if ([result isKindOfClass:[NSString class]] && result.length>0) {
-                NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
-                [sendDict setObject:result forKey:@"content"];
-                if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
-                    [sendDict setObject:realPath forKey:@"imgPath"];
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@"albumError"} errDict:nil doDelete:NO];
+        } else {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
+                if (error) {
+                    NSLog(@"Turbo FNScanner save diyscanner image error");
                 }
-                if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
-                    [sendDict setObject:imgUrl forKey:@"albumPath"];
+                NSString *imgUrl = [assetURL absoluteString];
+                //diy扫码成功的回调
+                if ([result isKindOfClass:[NSString class]] && result.length>0) {
+                    NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
+                    [sendDict setObject:result forKey:@"content"];
+                    if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
+                        [sendDict setObject:realPath forKey:@"imgPath"];
+                    }
+                    if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
+                        [sendDict setObject:imgUrl forKey:@"albumPath"];
+                    }
+                    [sendDict setObject:@"success" forKey:@"eventType"];
+                    [self sendResultEventWithCallbackId:callViewBackID dataDict:sendDict errDict:nil doDelete:NO];
+                } else {
+                    [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@""} errDict:nil doDelete:NO];
                 }
-                [sendDict setObject:@"success" forKey:@"eventType"];
-                [self sendResultEventWithCallbackId:callViewBackID dataDict:sendDict errDict:nil doDelete:NO];
-            }
-        }];
+            }];
+        }
     } else {
         //diy扫码成功的回调
         if ([result isKindOfClass:[NSString class]] && result.length>0) {
@@ -469,6 +537,8 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
                 [sendDict setObject:realPath forKey:@"imgPath"];
             }
             [self sendResultEventWithCallbackId:callViewBackID dataDict:sendDict errDict:nil doDelete:NO];
+        } else {
+            [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@""} errDict:nil doDelete:NO];
         }
     }
     [self.captureView.session stopRunning];
@@ -508,26 +578,30 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     }
     //保存图片到相册
     if (openSaveToAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
-            if (error) {
-                NSLog(@"Turbo FNScanner save image error");
-            }
-            NSString *imgUrl = [assetURL absoluteString];
-            //open扫码成功的回调
-            if ([result isKindOfClass:[NSString class]] && result.length>0) {//open的回调
-                NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
-                [sendDict setObject:@"success" forKey:@"eventType"];
-                [sendDict setObject:result forKey:@"content"];
-                if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
-                    [sendDict setObject:realPath forKey:@"imgPath"];
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"albumError"} errDict:nil doDelete:NO];
+        } else {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
+                if (error) {
+                    NSLog(@"Turbo FNScanner save image error");
                 }
-                if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
-                    [sendDict setObject:imgUrl forKey:@"albumPath"];
+                NSString *imgUrl = [assetURL absoluteString];
+                //open扫码成功的回调
+                if ([result isKindOfClass:[NSString class]] && result.length>0) {//open的回调
+                    NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
+                    [sendDict setObject:@"success" forKey:@"eventType"];
+                    [sendDict setObject:result forKey:@"content"];
+                    if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
+                        [sendDict setObject:realPath forKey:@"imgPath"];
+                    }
+                    if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
+                        [sendDict setObject:imgUrl forKey:@"albumPath"];
+                    }
+                    [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
                 }
-                [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
-            }
-        }];
+            }];
+        }
     } else {
         //open扫码成功的回调
         if ([result isKindOfClass:[NSString class]] && result.length>0) {//open的回调
@@ -559,7 +633,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];//open的回调
         [sendDict setObject:@"fail" forKey:@"eventType"];
         [sendDict setObject:@"非法图片" forKey:@"content"];
-        [self sendResultEventWithCallbackId:callBackFail dataDict:sendDict errDict:nil doDelete:YES];
+        [self sendResultEventWithCallbackId:callBackFail dataDict:sendDict errDict:@{@"code":@(-100)} doDelete:YES];
         return;
     }
 }
@@ -633,26 +707,30 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     
     //保存图片到相册
     if (openSaveToAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
-            if (error) {
-                NSLog(@"Turbo FNScanner save image error");
-            }
-            NSString *imgUrl = [assetURL absoluteString];
-            //open扫码成功的回调
-            if ([text isKindOfClass:[NSString class]] && text.length>0) {//open的回调
-                NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
-                [sendDict setObject:@"success" forKey:@"eventType"];
-                [sendDict setObject:text forKey:@"content"];
-                if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
-                    [sendDict setObject:realPath forKey:@"imgPath"];
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"albumError"} errDict:nil doDelete:NO];
+        } else {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
+                if (error) {
+                    NSLog(@"Turbo FNScanner save image error");
                 }
-                if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
-                    [sendDict setObject:imgUrl forKey:@"albumPath"];
+                NSString *imgUrl = [assetURL absoluteString];
+                //open扫码成功的回调
+                if ([text isKindOfClass:[NSString class]] && text.length>0) {//open的回调
+                    NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
+                    [sendDict setObject:@"success" forKey:@"eventType"];
+                    [sendDict setObject:text forKey:@"content"];
+                    if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
+                        [sendDict setObject:realPath forKey:@"imgPath"];
+                    }
+                    if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
+                        [sendDict setObject:imgUrl forKey:@"albumPath"];
+                    }
+                    [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
                 }
-                [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
-            }
-        }];
+            }];
+        }
     } else {
         //open扫码成功的回调
         if ([text isKindOfClass:[NSString class]] && text.length>0) {//open的回调
@@ -774,26 +852,30 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     
     //保存图片到相册
     if (diySaveToAlbum) {
-        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-        [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
-            if (error) {
-                NSLog(@"Turbo FNScanner save diyscanner image error");
-            }
-            NSString *imgUrl = [assetURL absoluteString];
-            //diy扫码成功的回调
-            if ([result isKindOfClass:[NSString class]] && result.length>0) {
-                NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
-                [sendDict setObject:result forKey:@"content"];
-                if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
-                    [sendDict setObject:realPath forKey:@"imgPath"];
+        if (![self canUseAlbum]) {
+            [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@"albumError"} errDict:nil doDelete:NO];
+        } else {
+            ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+            [library writeImageToSavedPhotosAlbum:[image CGImage] orientation:(ALAssetOrientation)[image imageOrientation] completionBlock:^(NSURL *assetURL, NSError *error){
+                if (error) {
+                    NSLog(@"Turbo FNScanner save diyscanner image error");
                 }
-                if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
-                    [sendDict setObject:imgUrl forKey:@"albumPath"];
+                NSString *imgUrl = [assetURL absoluteString];
+                //diy扫码成功的回调
+                if ([result isKindOfClass:[NSString class]] && result.length>0) {
+                    NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];
+                    [sendDict setObject:result forKey:@"content"];
+                    if ([realPath isKindOfClass:[NSString class]] && realPath.length>0) {
+                        [sendDict setObject:realPath forKey:@"imgPath"];
+                    }
+                    if ([imgUrl isKindOfClass:[NSString class]] && imgUrl.length>0) {
+                        [sendDict setObject:imgUrl forKey:@"albumPath"];
+                    }
+                    [sendDict setObject:@"success" forKey:@"eventType"];
+                    [self sendResultEventWithCallbackId:callViewBackID dataDict:sendDict errDict:nil doDelete:NO];
                 }
-                [sendDict setObject:@"success" forKey:@"eventType"];
-                [self sendResultEventWithCallbackId:callViewBackID dataDict:sendDict errDict:nil doDelete:NO];
-            }
-        }];
+            }];
+        }
     } else {
         //diy扫码成功的回调
         if ([result isKindOfClass:[NSString class]] && result.length>0) {
@@ -819,6 +901,9 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 }
 #pragma mark从相册读取图片解码
 - (void)openAlbum:(UIButton *)btn {//从相册读取图片解码
+    if (![self canUseAlbum]) {
+        [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"albumError"} errDict:nil doDelete:NO];
+    }
     [self.viewController dismissModalViewControllerAnimated:NO];
     NSDictionary *sendDict = [NSDictionary dictionaryWithObject:@"selectImage" forKey:@"eventType"];
     [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:NO];
@@ -936,8 +1021,8 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     } else {//decode的回调
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];//decode的回调
         [sendDict setObject:[NSNumber numberWithBool:false] forKey:@"status"];
-        [sendDict setObject:@"非法图片" forKey:@"content"];
-        [self sendResultEventWithCallbackId:callBackDecode dataDict:sendDict errDict:nil doDelete:YES];
+        [sendDict setObject:@"识别失败，请检查二维码图片是否正确" forKey:@"content"];
+        [self sendResultEventWithCallbackId:callBackDecode dataDict:sendDict errDict:@{@"code":@(3)} doDelete:YES];
     }
 }
 #pragma mark 保存图片到指定路径
@@ -1016,6 +1101,62 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         newImage = sourceImage;
     }
     return newImage ;
+}
+
+- (BOOL)canUseCamera {
+    //ios 7.0及以上
+    NSString * mediaType = AVMediaTypeVideo;
+    AVAuthorizationStatus  cameraStatus = [AVCaptureDevice authorizationStatusForMediaType:mediaType];
+    BOOL status = NO;
+    NSString *details = nil;
+    switch (cameraStatus) {
+        case AVAuthorizationStatusNotDetermined:
+            details = @"notDetermined";
+            status = YES;
+            break;
+        case AVAuthorizationStatusRestricted:
+            details = @"restricted";
+            break;
+        case AVAuthorizationStatusDenied:
+            details = @"denied";
+            break;
+        case AVAuthorizationStatusAuthorized:
+            details = @"authorized";
+            status = YES;
+            break;
+            
+        default:
+            details = @"denied";
+            break;
+    }
+    return status;
+}
+
+- (BOOL)canUseAlbum {
+    ALAuthorizationStatus photoStatus = [ALAssetsLibrary authorizationStatus];
+    BOOL status = NO;
+    NSString *details = nil;
+    switch (photoStatus) {
+        case ALAuthorizationStatusNotDetermined:
+            details = @"notDetermined";
+            status = YES;
+            break;
+        case ALAuthorizationStatusRestricted:
+            details = @"restricted";
+            break;
+        case ALAuthorizationStatusDenied:
+            details = @"denied";
+            break;
+        case ALAuthorizationStatusAuthorized:
+            details = @"authorized";
+            status = YES;
+            break;
+            
+        default:
+            details = @"denied";
+            break;
+    }
+    return status;
 }
 
 @end

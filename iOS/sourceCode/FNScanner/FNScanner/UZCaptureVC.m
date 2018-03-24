@@ -7,6 +7,8 @@
 
 #import "UZCaptureVC.h"
 
+#define FNScanner_iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
+
 @interface UZCaptureVC ()
 {
     BOOL getCodePicture;
@@ -14,14 +16,14 @@
     UIImageView *_background;
 }
     @property (nonatomic ,strong) NSString *resultStr;
+
 @end
 
 @implementation UZCaptureVC
 
 #pragma mark  lifeCycle
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
@@ -42,7 +44,9 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    _preview.frame = self.view.bounds;
+    if (!FNScanner_iPhoneX) {
+        _preview.frame = self.view.bounds;
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -52,7 +56,7 @@
 #pragma orintation
 
 - (BOOL)shouldAutorotate {
-    if (!self.autoFit) {
+    if (FNScanner_iPhoneX || !self.autoFit) {
         return NO;
     }
     _preview.frame = self.view.bounds;
@@ -111,7 +115,12 @@
     //中间游标
     UIImageView *arrow = (UIImageView *)[_background viewWithTag:1000];
     arrow.hidden = NO;
-    [_background addSubview:arrow];
+    float arrowY = arrow.frame.origin.y;
+    float arrowX = arrow.frame.origin.x;
+    float arrowW = arrow.frame.size.width;
+    float arrowH = arrow.frame.size.height;
+    //扫码区域设定 x对应距离左上角的垂直距离，y对应距离左上角的水平距离,w、h情况类似。实际为(y,x,h,w)
+    _output.rectOfInterest = CGRectMake(arrowY/height, arrowX/width, arrowH/height, arrowW/width);
     //开关闪光灯操作的button
     UIButton *cancelButton1 = (UIButton *)[_background viewWithTag:789];
     [cancelButton1 setFrame:CGRectMake(width-40, 37,15, 22)];
@@ -133,6 +142,8 @@
     }
     _background.frame = CGRectMake(0, 0, width, 64);
     _background.image = [self getImage:@"FNS_nvg_bg"];
+    //扫码区域设定 x对应距离左上角的垂直距离，y对应距离左上角的水平距离,w、h情况类似。实际为(y,x,h,w)
+    _output.rectOfInterest = CGRectMake(0, 0.25, 1, 0.5);
     //中间游标
     UIImageView *arrow = (UIImageView *)[_background viewWithTag:1000];
     arrow.hidden = YES;
@@ -261,9 +272,6 @@
     [NSDictionary dictionaryWithObject:
      [NSNumber numberWithInt:kCVPixelFormatType_32BGRA]
                                 forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-    //扫码区域设定 x对应距离左上角的垂直距离，y对应距离左上角的水平距离,w、h情况类似
-    _output.rectOfInterest = CGRectMake(0, 0, 1, 1);//处理区域是全屏
-    //CGRectMake（y的起点/屏幕的高，x的起点/屏幕的宽，扫描的区域的高/屏幕的高，扫描的区域的宽/屏幕的宽）
     // 初始化链接对象
     _session = [[AVCaptureSession alloc]init];
     // 高质量采集率
@@ -287,12 +295,36 @@
             _output.metadataObjectTypes =@[AVMetadataObjectTypeUPCECode, AVMetadataObjectTypeCode39Code, AVMetadataObjectTypeCode39Mod43Code, AVMetadataObjectTypeEAN13Code, AVMetadataObjectTypeEAN8Code, AVMetadataObjectTypeCode93Code, AVMetadataObjectTypeCode128Code, AVMetadataObjectTypePDF417Code, AVMetadataObjectTypeQRCode, AVMetadataObjectTypeAztecCode];
         }
     }
+    float width = [UIScreen mainScreen].bounds.size.width;
+    float height = [UIScreen mainScreen].bounds.size.height;
     // Preview
     _preview =[AVCaptureVideoPreviewLayer layerWithSession:self.session];
     _preview.videoGravity = AVLayerVideoGravityResize;
-    _preview.frame = self.view.bounds;
+    if (FNScanner_iPhoneX) {
+        float preHeight = (4.0*width)/3.0;
+        float scale = height/preHeight;
+        _preview.frame = CGRectMake(0, 0, width, preHeight);
+        //CGRect prRect = _preview.frame;
+        //NSLog(@"起点x:%f,起点y:%f,宽w:%f,高h:%f",prRect.origin.x,prRect.origin.y,prRect.size.width,prRect.size.height);
+        //NSLog(@"位置x:%f,位置y:%f",_preview.position.x,_preview.position.y);
+        _preview.affineTransform = CGAffineTransformMakeScale(scale, scale);
+        //CGRect prRect1 = _preview.frame;
+        //NSLog(@"放大后：起点x:%f,起点y:%f,宽w:%f,高h:%f",prRect1.origin.x,prRect1.origin.y,prRect1.size.width,prRect1.size.height);
+        //NSLog(@"放大后位置x:%f,位置y:%f",_preview.position.x,_preview.position.y);
+        _preview.position = self.view.center;
+    } else {
+        _preview.frame = self.view.bounds;
+    }
+    //_preview.transform
     [self.view.layer addSublayer:self.preview];
     
+    float arrowX = 48 * width/320;
+    float arrowY = 148 * height/568;
+    float arrowW = 221 * width/320;
+    float arrowH = 261 * height/568;
+    //扫码区域设定 x对应距离左上角的垂直距离，y对应距离左上角的水平距离,w、h情况类似。实际为(y,x,h,w)
+    _output.rectOfInterest = CGRectMake(arrowY/height, arrowX/width, arrowH/height, arrowW/width);
+    //CGRectMake（y的起点/屏幕的高，x的起点/屏幕的宽，扫描的区域的高/屏幕的高，扫描的区域的宽/屏幕的宽）
     // 开始捕获
     [_session startRunning];
 }
@@ -318,7 +350,10 @@
         }
         getCodePicture = NO;
         [_session stopRunning];
-        [self performSelectorOnMainThread:@selector(dissmissVC) withObject:nil waitUntilDone:NO];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self dismissViewControllerAnimated:NO completion:nil];
+        });
+        //[self performSelectorOnMainThread:@selector(dissmissVC) withObject:nil waitUntilDone:NO];
     }
 }
 

@@ -15,9 +15,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.uzmap.pkg.uzcore.UZCoreUtil;
+import com.uzmap.pkg.uzcore.uzmodule.UZModule;
 import com.uzmap.pkg.uzcore.uzmodule.UZModuleContext;
 import com.uzmap.pkg.uzkit.UZUtility;
 
@@ -56,8 +60,8 @@ public class JsParamsUtil {
 		return defaultValue;
 	}
 
-	public int h(UZModuleContext moduleContext, Context context) {
-		int defaultValue = getScreenHeight((Activity) context);
+	public int h(UZModuleContext moduleContext, Context context, UZModule module) {
+		int defaultValue = getScreenHeight((Activity) context, module);
 		JSONObject rect = moduleContext.optJSONObject("rect");
 		if (!moduleContext.isNull("rect")) {
 			return rect.optInt("h", defaultValue);
@@ -119,12 +123,21 @@ public class JsParamsUtil {
 		DisplayMetrics metric = new DisplayMetrics();
 		act.getWindowManager().getDefaultDisplay().getMetrics(metric);
 		return UZCoreUtil.pixToDip(metric.widthPixels);
+		//====
 	}
 
-	private int getScreenHeight(Activity act) {
+	private int getScreenHeight(Activity act, UZModule module) {
 		DisplayMetrics metric = new DisplayMetrics();
+		
 		act.getWindowManager().getDefaultDisplay().getMetrics(metric);
+		Rect frame = new Rect();
+		act.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+		int statusBarHeight = frame.top;
 		return UZCoreUtil.pixToDip(metric.heightPixels);
+		
+//		WindowManager manager = (WindowManager) act.getSystemService(Context.WINDOW_SERVICE);
+//		Display display = manager.getDefaultDisplay();
+//		return display.getHeight();
 	}
 	
 	public Bitmap getBitmap(String path) {

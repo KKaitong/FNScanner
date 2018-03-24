@@ -18,6 +18,9 @@ package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.decoding;
 
 import java.util.Hashtable;
 
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +34,7 @@ import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 import com.uzmap.pkg.uzcore.UZResourcesIDFinder;
+import com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureActivity;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.CameraManager;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.PlanarYUVLuminanceSource;
@@ -41,13 +45,22 @@ final class DecodeHandler extends Handler {
 
 	private final CaptureActivity activity;
 	private final MultiFormatReader multiFormatReader;
+	
+	private boolean mPortraitFlag = true;
 
 	DecodeHandler(CaptureActivity activity,
 			Hashtable<DecodeHintType, Object> hints) {
 		multiFormatReader = new MultiFormatReader();
 		multiFormatReader.setHints(hints);
 		this.activity = activity;
+		
+		EventBus.getDefault().register(this);
 	}
+	
+	@Subscriber(tag = "reset_orientation")
+    private void updateFlag(boolean flag) {
+        mPortraitFlag = flag;
+    }
 
 	@Override
 	public void handleMessage(Message message) {
@@ -82,18 +95,42 @@ final class DecodeHandler extends Handler {
 		long start = System.currentTimeMillis();
 		Result rawResult = null;
 
-		byte[] rotatedData = new byte[data.length];
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++)
-				rotatedData[x * height + height - y - 1] = data[x + y * width];
+		
+//		byte[] rotatedData = new byte[data.length];
+//		for (int y = 0; y < height; y++) {
+//			for (int x = 0; x < width; x++)
+//				rotatedData[x * height + height - y - 1] = data[x + y * width];
+//		}
+//		int tmp = width; // Here we are swapping, that's the difference to #11
+//		width = height;
+//		height = tmp;
+//		data = rotatedData;
+		
+		if (UzFNScanner.isWindow) {
+			byte[] rotatedData = new byte[data.length];
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++)
+                    rotatedData[x * height + height - y - 1] = data[x + y * width];
+            }
+            int tmp = width; // Here we are swapping, that's the difference to #11
+            width = height;
+            height = tmp;
+            data = rotatedData;
+		}else {
+			if (CaptureActivity.mOrientationFlag) {
+	            byte[] rotatedData = new byte[data.length];
+	            for (int y = 0; y < height; y++) {
+	                for (int x = 0; x < width; x++)
+	                    rotatedData[x * height + height - y - 1] = data[x + y * width];
+	            }
+	            int tmp = width; // Here we are swapping, that's the difference to #11
+	            width = height;
+	            height = tmp;
+	            data = rotatedData;
+	        }
 		}
-		int tmp = width; // Here we are swapping, that's the difference to #11
-		width = height;
-		height = tmp;
-		data = rotatedData;
-
-		PlanarYUVLuminanceSource source = CameraManager.get()
-				.buildLuminanceSource(data, width, height);
+	
+		PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(data, width, height);
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 		try {
 			rawResult = multiFormatReader.decodeWithState(bitmap);

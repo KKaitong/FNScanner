@@ -7,30 +7,44 @@
 package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing;
 
 import java.io.File;
+import java.util.Observer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.simple.eventbus.EventBus;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Display;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import com.google.zxing.Result;
 import com.uzmap.pkg.uzcore.UZResourcesIDFinder;
+import com.uzmap.pkg.uzkit.UZUtility;
 import com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.CameraManager;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.decoding.CaptureActivityHandler;
@@ -41,8 +55,7 @@ import com.uzmap.pkg.uzmodules.uzFNScanner.utlis.BeepUtil;
 import com.uzmap.pkg.uzmodules.uzFNScanner.utlis.ScanUtil;
 import com.uzmap.pkg.uzmodules.uzFNScanner.utlis.ScannerDecoder;
 
-public class CaptureActivity extends Activity implements Callback,
-		OnClickListener {
+public class CaptureActivity extends Activity implements Callback, OnClickListener {
 	private static final int REQUEST_CODE = 234;
 	private CaptureActivityHandler mHandler;
 	private ViewfinderView mViewfinderView;
@@ -59,17 +72,57 @@ public class CaptureActivity extends Activity implements Callback,
 	private int mOrientation = 0;
 	private OrientationEventListener mOrientationListener;
 	private boolean mIsOrientation = false;
+	private RelativeLayout mRlRoot;
+	private boolean isNewUI;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(getLayoutId());
+		int rotation = getDisplayRotation();
+		Intent intent = getIntent();
+		isNewUI = intent.getBooleanExtra("isNewUI", true);
+		if (isNewUI) {
+			if (rotation == 90) {
+				setContentView(getLayoutId());
+			}else {
+				setContentView(UZResourcesIDFinder.getResLayoutID("activity_land_scanner"));
+			}
+		}else {
+			if (rotation == 90) {
+				setContentView(UZResourcesIDFinder.getResLayoutID("activity_open_scanner"));
+			}else {
+				setContentView(UZResourcesIDFinder.getResLayoutID("activity_open_land_scanner"));
+			}
+		}
+		
 		init();
 		initParams();
 		initView();
+		//setOrientation();
 		initOrientation();
+		
 		startOrientationChangeListener();
+		EventBus.getDefault().register(this);
 	}
+	
+	public static boolean mOrientationFlag = true;
+	public static String RESET_ORIENTATION = "reset_orientation";
+	private void setOrientation() {
+		boolean orientationFlag = true;
+        int screenState = CaptureActivity.this.getResources().getConfiguration().orientation;
+        if (screenState == Configuration.ORIENTATION_LANDSCAPE){
+            mOrientationFlag = false;
+            orientationFlag = false;
+        } else if (screenState ==Configuration.ORIENTATION_PORTRAIT) {
+            mOrientationFlag = true;
+            orientationFlag = true;
+        }
+        EventBus.getDefault().post(orientationFlag, RESET_ORIENTATION);
+    }
+	
+	public static boolean getOrientationFlag() {
+        return mOrientationFlag;
+    }
 
 	private void init() {
 		CameraManager.init(getApplication());
@@ -96,6 +149,7 @@ public class CaptureActivity extends Activity implements Callback,
 
 	private void initView() {
 		mViewfinderView = (ViewfinderView) findViewById(finderViewId());
+		mRlRoot = (RelativeLayout) findViewById(UZResourcesIDFinder.getResIdID("rl_root"));
 		findViewById(backBtnId()).setOnClickListener(this);
 		findViewById(selectImgBtnId()).setOnClickListener(this);
 		findViewById(switchLightBtnId()).setOnClickListener(this);
@@ -149,8 +203,8 @@ public class CaptureActivity extends Activity implements Callback,
 	}
 
 	public void handleDecode(final Result obj, Bitmap barcode) {
-		mInactivityTimer.onActivity();
-		mBeepUtil.playBeepSoundAndVibrate();
+//		mInactivityTimer.onActivity();
+		 mBeepUtil.playBeepSoundAndVibrate();
 		String savePath = null;
 		ScanUtil.scanResult2img(obj.getText(), mSavePath, mSaveW, mSaveH,
 				mIsSaveToAlbum, false, this);
@@ -226,6 +280,7 @@ public class CaptureActivity extends Activity implements Callback,
 
 	@Override
 	protected void onResume() {
+		setOrientation();
 		if (!mIsOrientation) {
 			if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
 				setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -233,7 +288,6 @@ public class CaptureActivity extends Activity implements Callback,
 		}
 		super.onResume();
 		initOnResume();
-
 	}
 
 	private void initOnResume() {
@@ -258,10 +312,21 @@ public class CaptureActivity extends Activity implements Callback,
 		try {
 			WindowManager manager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 			Display display = manager.getDefaultDisplay();
-			CameraManager.get().openDriver(surfaceHolder, display.getWidth(),
-					display.getHeight());
+			CameraManager.get().openDriver(surfaceHolder, display.getWidth(), display.getHeight(), false);
 			chargeScreenAngle();
 		} catch (Exception e) {
+			//check camera  begin
+			if(UzFNScanner.mModuleContext != null){
+				JSONObject ret = new JSONObject();
+				try {
+					ret.put("eventType", "cameraError");
+					UzFNScanner.mModuleContext.success(ret, false);
+					finish();
+				} catch (JSONException e2) {
+					e2.printStackTrace();
+				}
+			}
+			//check camera end add by at 2017-09-01 17:56:12
 			return;
 		}
 		if (mHandler == null) {
@@ -280,6 +345,11 @@ public class CaptureActivity extends Activity implements Callback,
 		if (mHandler != null) {
 			mHandler.quitSynchronously();
 			mHandler = null;
+		}
+		if (!mHasSurface) {
+			SurfaceView surfaceView = (SurfaceView) findViewById(preViewId());
+			SurfaceHolder surfaceHolder = surfaceView.getHolder();
+			surfaceHolder.removeCallback(this);
 		}
 		CameraManager.get().closeDriver();
 	}
@@ -303,7 +373,8 @@ public class CaptureActivity extends Activity implements Callback,
 	}
 
 	private int getLayoutId() {
-		return UZResourcesIDFinder.getResLayoutID("mo_fnscanner_main");
+		return UZResourcesIDFinder.getResLayoutID("activity_scanner");
+		//return UZResourcesIDFinder.getResLayoutID("mo_fnscanner_main");
 	}
 
 	private int finderViewId() {
@@ -336,7 +407,64 @@ public class CaptureActivity extends Activity implements Callback,
 		if (!mHasSurface) {
 			mHasSurface = true;
 			initCamera(holder);
+			if (isNewUI) {
+				Rect frame;
+				int rotation = getDisplayRotation();
+				if (rotation == 90) {
+					frame = CameraManager.get().getFramingRect();
+				}else {
+					frame = CameraManager.get().getLandFramingRect();
+				}
+				if (frame != null) {
+					addFlash(frame);
+				}
+			}
 		}
+	}
+	
+	private void addFlash(Rect frame) {
+		RelativeLayout flashRoot = new RelativeLayout(this);
+		RelativeLayout.LayoutParams flashParams = new LayoutParams(UZUtility.dipToPix(40), UZUtility.dipToPix(33));
+		flashParams.leftMargin = frame.left + frame.width() / 2 - UZUtility.dipToPix(40) / 2;
+		flashParams.topMargin = frame.bottom - UZUtility.dipToPix(40);
+		flashRoot.setLayoutParams(flashParams);
+		
+		final ImageView ivFlash = new ImageView(this);
+		RelativeLayout.LayoutParams ivflashParams = new LayoutParams(UZUtility.dipToPix(20), UZUtility.dipToPix(20));
+		ivflashParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		ivFlash.setLayoutParams(ivflashParams);
+		ivFlash.setImageResource(UZResourcesIDFinder.getResDrawableID("mo_flash_off"));
+		flashRoot.addView(ivFlash);
+		
+		final TextView flash_state = new TextView(this);
+		RelativeLayout.LayoutParams tvParams = new LayoutParams(-2, -2);
+		tvParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		tvParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		flash_state.setLayoutParams(tvParams);
+		flash_state.setText("轻触照亮");
+		flash_state.setTextColor(Color.parseColor("#ffffff"));
+		flash_state.setTextSize(10);
+		flashRoot.addView(flash_state);
+		
+		mRlRoot.addView(flashRoot);
+		
+		flashRoot.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (mSwitchLigthFlag == true) {
+					mSwitchLigthFlag = false;
+					ivFlash.setImageResource(UZResourcesIDFinder.getResDrawableID("mo_flash_on"));
+					flash_state.setText("轻触关闭");
+					CameraManager.get().openLight();
+				} else {
+					mSwitchLigthFlag = true;
+					ivFlash.setImageResource(UZResourcesIDFinder.getResDrawableID("mo_flash_off"));
+					flash_state.setText("轻触照亮");
+					CameraManager.get().offLight();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -385,6 +513,9 @@ public class CaptureActivity extends Activity implements Callback,
 		return 0;
 	}
 
+	/**
+	 * 屏幕变换的监听
+	 */
 	private final void startOrientationChangeListener() {
 		this.mOrientationListener = new OrientationEventListener(this) {
 			public void onOrientationChanged(int rotation) {

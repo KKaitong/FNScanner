@@ -16,12 +16,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import com.google.zxing.Result;
+import com.uzmap.pkg.uzcore.uzmodule.UZModule;
 import com.uzmap.pkg.uzcore.uzmodule.UZModuleContext;
 import com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.CameraManager;
@@ -91,7 +96,7 @@ public class CaptureView extends FrameLayout implements Callback {
 	private void initSurface() {
 		SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
 		if (mHasSurface) {
-			initCamera(surfaceHolder);
+			initCamera(surfaceHolder,mUzFNScanner);
 		} else {
 			surfaceHolder.addCallback(this);
 			surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -110,15 +115,31 @@ public class CaptureView extends FrameLayout implements Callback {
 		mInactivityTimer.shutdown();
 	}
 
-	private void initCamera(SurfaceHolder surfaceHolder) {
+	private void initCamera(SurfaceHolder surfaceHolder,UzFNScanner mUZModule) {
 		try {
-			int width = 1920;
-			int heigth = 1080;
-			CameraManager.get().openDriver(surfaceHolder, width, heigth);
+//			int width = 1080;
+//			int heigth = 1920;
+			WindowManager manager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+			Display display = manager.getDefaultDisplay();
+			if (mModuleContext.isNull("rect")) {
+				CameraManager.get().openDriver(surfaceHolder, display.getWidth(), display.getHeight(), false);
+			}else {
+				JSONObject json = mModuleContext.optJSONObject("rect");
+				if (json.isNull("w") && json.isNull("h")) {
+					CameraManager.get().openDriver(surfaceHolder, display.getWidth(), display.getHeight(), false);
+				}else {
+					CameraManager.get().openDriver(surfaceHolder, display.getWidth(), display.getHeight(), false);
+				}
+			}
+			
 			CameraManager.get().setScreemOrientation(90);
 		} catch (IOException ioe) {
+			ioe.printStackTrace();
 			return;
 		} catch (RuntimeException e) {
+			//check camera  begin
+				mUZModule.checkOpenCameraCallback(this);
+			//check camera end add by at 2017-09-01 17:56:12
 			return;
 		}
 		if (mHandler == null) {
@@ -136,7 +157,7 @@ public class CaptureView extends FrameLayout implements Callback {
 	public void surfaceCreated(SurfaceHolder holder) {
 		if (!mHasSurface) {
 			mHasSurface = true;
-			initCamera(holder);
+			initCamera(holder,mUzFNScanner);
 		}
 
 	}
@@ -159,7 +180,7 @@ public class CaptureView extends FrameLayout implements Callback {
 	}
 
 	public void handleDecode(final Result obj, Bitmap barcode) {
-		mInactivityTimer.onActivity();
+//		mInactivityTimer.onActivity();
 		mBeepUtil.playBeepSoundAndVibrate();
 		String savePath = null;
 		ScanUtil.scanResult2img(obj.getText(), mSavePath, mSaveW, mSaveH,

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>Hello APP</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css" />
+		<style>
+			section {
+				position: relative;
+				top: 400px;
+				margin: 8px;
+				background-color: #fff;
+			}
+			h2 {
+				position: relative;
+				height: 44px;
+				line-height: 44px;
+				color: #888;
+			}
+			div {
+				position: relative;
+				height: 56px;
+				margin: 8px;
+				text-align: center;
+				font-size: 12px;
+				line-height: 56px;
+				color: #fff;
+				background-color: #354399;
+				background-clip: padding;
+				box-shadow: 0 0 1px 1px #ccc;
+				border-radius: 2px;
+			}
+			.active {
+				opacity: 0.7;
+			}
+		</style>
+	</head>
+	<body>
+		<section>
+			<h2>FNScanner</h2>
+			<div tapmode="active" onclick="fnOpenScanner()">
+				打开二维码扫描222222222222
+			</div>
+			<div tapmode="active" onclick="fnOpenView()">
+				打开自定义扫描
+			</div>
+			
+			<div tapmode="active" onclick="fnOpenView1()">
+				打开自定义扫描(有宽高)
+			</div>
+				
+			<div tapmode="active" onclick="fnSetFrame()">
+				重设位置
+			</div>
+			<div tapmode="active" onclick="fnCloseView()">
+				关闭
+			</div>
+			
+			<div tapmode="active" onclick="fnDecodeImg()">
+				解码
+			</div>
+			<div tapmode="active" onclick="fnencodeImg()">
+				将字符串生成二维码图片
+			</div>
+			<div tapmode="active" onclick="fnswitchLight()">
+				打开/关闭闪光灯
+			</div>
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript">
+	
+//	window.apiready = function() {
+//	 console.log("倒计时开始=== ");
+//		setTimeout(function() {
+//			fnswitchLight();
+//			//alert('10秒钟到！');
+//		}, 5000)
+//	}
+	
+		apiready = function() {
+			var FNScanner = api.require('FNScanner');
+			
+			api.addEventListener({
+					name:'resume'
+				}, function(ret, err){    
+					FNScanner.onResume();
+					//alert('应用回到后台');
+				});		
+			api.addEventListener({
+					name:'pause'
+				}, function(ret, err){    
+					FNScanner.onResume();
+					//alert('应用回到后台');
+				});		
+		}
+	
+		function fnOpenScanner() {
+			var FNScanner = api.require('FNScanner');
+			FNScanner.openScanner({
+				autorotation : false,  //是否自动旋转
+				saveToAlbum:true,     //是否自动保存相册
+				saveImg:{
+				    path: 'fs://a.jpg',  //字符串类型；保存的文件路径；若路径不存在，则创建此路径，只支持fs://协议
+				    w: 200,              //（可选项）数字类型；生成图片的宽度，默认：200
+				    h: 200               //（可选项）数字类型；生成图片的高度，默认：200
+				}
+			}, function(ret, err) {
+				if (ret) {
+					//alert(JSON.stringify(ret));
+					api.openWin({name:'06_css_06_text', url:'FNScanner.html'});
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		};
+		
+		function fnOpenView(){
+		var FNScanner = api.require('FNScanner');
+			FNScanner.openView({
+				rect:
+				{
+				    x: 0,   //（可选项）数字类型；模块左上角的 x 坐标（相对于所属的 Window 或 Frame）；默认：0
+				    y: 0,   //（可选项）数字类型；模块左上角的 y 坐标（相对于所属的 Window 或 Frame）；默认：0
+				    w: 200, //（可选项）数字类型；模块的宽度；默认：所属的 Window 或 Frame 的宽度
+				    h: 300  //（可选项）数字类型；模块的高度；默认：所属的 Window 或 Frame 的高度
+				},
+			    autorotation: true,
+			    saveToAlbum:true,//是否保存到相册
+			    saveImg:
+			    {
+				    path: 'fs://a.jpg',   // 字符串类型；保存的文件路径；若路径不存在，则创建此路径，只支持 fs:// 协议
+				    w: 200,               //（可选项）数字类型；生成图片的宽度，默认：200
+				    h: 200                //（可选项）数字类型；生成图片的高度，默认：200
+				},
+				fixedOn:api.frameName,
+				fixed:true
+			}, function(ret, err) {
+			    if (ret) {
+			        alert(JSON.stringify(ret));
+			    } else {
+			        alert(JSON.stringify(err));
+			    }
+			});
+		
+		}
+		
+		function fnOpenView1(){
+		var FNScanner = api.require('FNScanner');
+			FNScanner.openView({
+				rect:
+				{
+				    x: 0,   //（可选项）数字类型；模块左上角的 x 坐标（相对于所属的 Window 或 Frame）；默认：0
+				    y: 0,   //（可选项）数字类型；模块左上角的 y 坐标（相对于所属的 Window 或 Frame）；默认：0
+				    w: api.winWidth/2, //（可选项）数字类型；模块的宽度；默认：所属的 Window 或 Frame 的宽度
+				    h: api.winHeight/2  //（可选项）数字类型；模块的高度；默认：所属的 Window 或 Frame 的高度
+				},
+			    autorotation: true,
+			    saveToAlbum:true,//是否保存到相册
+			    saveImg:
+			    {
+				    path: 'fs://a.jpg',   // 字符串类型；保存的文件路径；若路径不存在，则创建此路径，只支持 fs:// 协议
+				    w: 200,               //（可选项）数字类型；生成图片的宽度，默认：200
+				    h: 200                //（可选项）数字类型；生成图片的高度，默认：200
+				},
+				fixedOn:api.frameName,
+				fixed:true
+			}, function(ret, err) {
+			    if (ret) {
+			        alert(JSON.stringify(ret));
+			    } else {
+			        alert(JSON.stringify(err));
+			    }
+			});
+		}
+		
+		function fnSetFrame(){
+		var FNScanner = api.require('FNScanner');
+			FNScanner.setFrame({
+			    x: 0,
+			    y: 0,
+			    w: 350,
+			    h: 170
+			});
+		}
+		function fnCloseView(){
+		var FNScanner = api.require('FNScanner');
+		FNScanner.closeView();
+		}
+		function fnDecodeImg() {
+			var FNScanner = api.require('FNScanner');
+			FNScanner.decodeImg({
+				//path : 'widget://res/apicloud.jpg'
+			}, function(ret, err) {
+				if (ret.status) {
+					alert(JSON.stringify(ret));
+				} else {
+					alert(JSON.stringify(err));
+				}
+			});
+		};
+		
+		function fnencodeImg(){
+		var FNScanner = api.require('FNScanner');
+			FNScanner.encodeImg({
+				type:'qr_image',//生成二维码图片
+			    content: 'http://www.apicloud.com/',
+			    saveToAlbum: true,
+			    saveImg: {
+			        path: 'fs://album.png',
+			        w: 200,
+			        h: 200
+			    }
+			}, function(ret, err) {
+			    if (ret.status) {
+			        alert(JSON.stringify(ret));
+			    } else {
+			        alert(JSON.stringify(err));
+			    }
+			});
+		}
+		
+		function fnswitchLight(){
+		console.log("开启闪光灯====");
+		var FNScanner = api.require('FNScanner');
+			FNScanner.switchLight({
+			    status: 'on'
+			});
+					
+		}
+	</script>
+</html>

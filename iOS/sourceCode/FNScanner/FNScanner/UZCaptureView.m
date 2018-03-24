@@ -75,6 +75,15 @@
         [self setupCamera];
     }
     self.preview.frame = self.bounds;
+    float h = self.preview.frame.size.height;
+    float w = self.preview.frame.size.width;
+    float interesty = _interestRect.origin.y;
+    float interestx = _interestRect.origin.x;
+    float interestw = _interestRect.size.width;
+    float interesth = _interestRect.size.height;
+    //CGRect newRect = [self.preview metadataOutputRectOfInterestForRect:_interestRect];
+    self.output.rectOfInterest = CGRectMake(interesty/h, interestx/w, interesth/h, interestw/w);
+    
     [self autorotateStatusBar];
 }
 

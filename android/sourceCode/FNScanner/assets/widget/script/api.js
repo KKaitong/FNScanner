@@ -1,1 +1,607 @@
-!function(e){function t(e,t,n,r){return"function"==typeof t&&(r=n,n=t,t=void 0),"function"!=typeof n&&(r=n,n=void 0),{url:e,data:t,fnSuc:n,dataType:r}}var n={},r=/android/gi.test(navigator.appVersion),o=function(){var t=e.localStorage;return r&&(t=os.localStorage()),t};n.trim=function(e){return String.prototype.trim?null==e?"":String.prototype.trim.call(e):e.replace(/(^\s*)|(\s*$)/g,"")},n.trimAll=function(e){return e.replace(/\s*/g,"")},n.isArray=function(e){return Array.isArray?Array.isArray(e):e instanceof Array},n.addEvt=function(e,t,n,r){r=r||!1,e.addEventListener&&e.addEventListener(t,n,r)},n.rmEvt=function(e,t,n,r){r=r||!1,e.removeEventListener&&e.removeEventListener(t,n,r)},n.one=function(e,t,n,r){r=r||!1;var o=this,i=function(){n&&n(),o.rmEvt(e,t,i,r)};o.addEvt(e,t,i,r)},n.dom=function(e,t){if(1===arguments.length&&"string"==typeof arguments[0]){if(document.querySelector)return document.querySelector(arguments[0])}else if(2===arguments.length&&e.querySelector)return e.querySelector(t)},n.domAll=function(e,t){if(1===arguments.length&&"string"==typeof arguments[0]){if(document.querySelectorAll)return document.querySelectorAll(arguments[0])}else if(2===arguments.length&&e.querySelectorAll)return e.querySelectorAll(t)},n.byId=function(e){return document.getElementById(e)},n.first=function(e,t){return 1===arguments.length?e.children[0]:2===arguments.length?this.dom(e,t+":first-child"):void 0},n.last=function(e,t){if(1===arguments.length){var n=e.children;return n[n.length-1]}return 2===arguments.length?this.dom(e,t+":last-child"):void 0},n.eq=function(e,t){return this.dom(e,":nth-child("+t+")")},n.not=function(e,t){return this.domAll(e,":not("+t+")")},n.prev=function(e){var t=e.previousSibling;return t.nodeType&&3===t.nodeType?t=t.previousSibling:void 0},n.next=function(e){var t=e.nextSibling;return t.nodeType&&3===t.nodeType?t=t.nextSibling:void 0},n.closest=function(e,t){var r,o,i=function(e,t){var n=0,r=e.length;for(n;r>n;n++)if(e[n].isEqualNode(t))return e[n];return!1},a=function(e,t){for(r=n.domAll(e.parentNode,t),o=i(r,e);!o;){if(e=e.parentNode,null!=e&&e.nodeType==e.DOCUMENT_NODE)return!1;a(e,t)}return o};return a(e,t)},n.contains=function(e,t){var n=!1;if(t===e)return n=!0;do if(t=t.parentNode,t===e)return n=!0;while(t===document.body||t===document.documentElement);return n},n.remove=function(e){e&&e.parentNode&&e.parentNode.removeChild(e)},n.attr=function(e,t,n){return 2==arguments.length?e.getAttribute(t):3==arguments.length?(e.setAttribute(t,n),e):void 0},n.removeAttr=function(e,t){2===arguments.length&&e.removeAttribute(t)},n.hasCls=function(e,t){return e.className.indexOf(t)>-1?!0:!1},n.addCls=function(e,t){if("classList"in e)e.classList.add(t);else{var n=e.className,r=n+" "+t;e.className=r}return e},n.removeCls=function(e,t){if("classList"in e)e.classList.remove(t);else{var n=e.className,r=n.replace(t,"");e.className=r}return e},n.toggleCls=function(e,t){return"classList"in e?e.classList.toggle(t):n.hasCls(e,t)?n.addCls(e,t):n.removeCls(e,t),e},n.val=function(e,t){if(1===arguments.length)switch(e.tagName){case"SELECT":var n=e.options[e.selectedIndex].value;return n;case"INPUT":return e.value;case"TEXTAREA":return e.value}if(2===arguments.length)switch(e.tagName){case"SELECT":return e.options[e.selectedIndex].value=t,e;case"INPUT":return e.value=t,e;case"TEXTAREA":return e.value=t,e}},n.prepend=function(e,t){return e.insertAdjacentHTML("afterbegin",t),e},n.append=function(e,t){return e.insertAdjacentHTML("beforeend",t),e},n.before=function(e,t){return e.insertAdjacentHTML("beforebegin",t),e},n.after=function(e,t){return e.insertAdjacentHTML("afterend",t),e},n.html=function(e,t){return 1===arguments.length?e.innerHTML:2===arguments.length?(e.innerHTML=t,e):void 0},n.text=function(e,t){return 1===arguments.length?e.textContent:2===arguments.length?(e.textContent=t,e):void 0},n.offset=function(e){var t,n;document.documentElement?(t=document.documentElement.scrollLeft,n=document.documentElement.scrollTop):(t=document.body.scrollLeft,n=document.body.scrollTop);var r=e.getBoundingClientRect();return{l:r.left+t,t:r.top+n,w:e.offsetWidth,h:e.offsetHeight}},n.css=function(e,t){"string"==typeof t&&t.indexOf(":")>0&&e.style&&(e.style.cssText+=";"+t)},n.cssVal=function(t,n){if(2===arguments.length){var r=e.getComputedStyle(t,null);return r.getPropertyValue(n)}},n.jsonToStr=function(e){return"object"==typeof e?JSON&&JSON.stringify(e):void 0},n.strToJson=function(e){return"string"==typeof e?JSON&&JSON.parse(e):void 0},n.setStorage=function(e,t){if(2===arguments.length){var n=t;"object"==typeof n?(n=JSON.stringify(n),n="obj-"+n):n="str-"+n;var r=o();r&&r.setItem(e,n)}},n.getStorage=function(e){var t=o();if(t){var n=t.getItem(e);if(!n)return;if(0===n.indexOf("obj-"))return n=n.slice(4),JSON.parse(n);if(0===n.indexOf("str-"))return n.slice(4)}},n.rmStorage=function(e){var t=o();t&&e&&t.removeItem(e)},n.clearStorage=function(){var e=o();e&&e.clear()},n.fixIos7Bar=function(e){var t=api.systemType;if("ios"==t){var n=api.systemVersion,r=parseInt(n,10),o=api.fullScreen,i=api.iOS7StatusBarAppearance;r>=7&&!o&&i&&(e.style.paddingTop="20px")}},n.toast=function(e,t,n){var r={},o=function(e,t){api.showProgress(e),setTimeout(function(){api.hideProgress()},t)};if(1===arguments.length){var n=n||500;"number"==typeof e?n=e:r.title=e+"",o(r,n)}else if(2===arguments.length){var n=n||500,t=t;if("number"==typeof t){var i=t;n=i,t=null}e&&(r.title=e),t&&(r.text=t),o(r,n)}e&&(r.title=e),t&&(r.text=t),n=n||500,o(r,n)},n.post=function(){var e=t.apply(null,arguments),n={},r=e.fnSuc;if(e.url&&(n.url=e.url),e.data&&(n.data=e.data),e.dataType){var o=e.dataType.toLowerCase();("text"==o||"json"==o)&&(n.dataType=o)}else n.dataType="json";n.method="post",api.ajax(n,function(e){e&&r&&r(e)})},n.get=function(){var e=t.apply(null,arguments),n={},r=e.fnSuc;if(e.url&&(n.url=e.url),e.dataType){var o=e.dataType.toLowerCase();("text"==o||"json"==o)&&(n.dataType=o)}else n.dataType="text";n.method="get",api.ajax(n,function(e){e&&r&&r(e)})},e.$api=n}(window);
+/*
+ * APICloud JavaScript Library
+ * Copyright (c) 2014 apicloud.com
+ */
+(function(window){
+    var u = {};
+    var isAndroid = (/android/gi).test(navigator.appVersion);
+    var uzStorage = function(){
+        var ls = window.localStorage;
+        if(isAndroid){
+           ls = os.localStorage();
+        }
+        return ls;
+    };
+    function parseArguments(url, data, fnSuc, dataType) {
+        if (typeof(data) == 'function') {
+            dataType = fnSuc;
+            fnSuc = data;
+            data = undefined;
+        }
+        if (typeof(fnSuc) != 'function') {
+            dataType = fnSuc;
+            fnSuc = undefined;
+        }
+        return {
+            url: url,
+            data: data,
+            fnSuc: fnSuc,
+            dataType: dataType
+        };
+    }
+    u.trim = function(str){
+        if(String.prototype.trim){
+            return str == null ? "" : String.prototype.trim.call(str);
+        }else{
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+        }
+    };
+    u.trimAll = function(str){
+        return str.replace(/\s*/g,'');
+    };
+    u.isElement = function(obj){
+        return !!(obj && obj.nodeType == 1);
+    };
+    u.isArray = function(obj){
+        if(Array.isArray){
+            return Array.isArray(obj);
+        }else{
+            return obj instanceof Array;
+        }
+    };
+    u.isEmptyObject = function(obj){
+        if(JSON.stringify(obj) === '{}'){
+            return true;
+        }
+        return false;
+    };
+    u.addEvt = function(el, name, fn, useCapture){
+        if(!u.isElement(el)){
+            console.warn('$api.addEvt Function need el param, el param must be DOM Element');
+            return;
+        }
+        useCapture = useCapture || false;
+        if(el.addEventListener) {
+            el.addEventListener(name, fn, useCapture);
+        }
+    };
+    u.rmEvt = function(el, name, fn, useCapture){
+        if(!u.isElement(el)){
+            console.warn('$api.rmEvt Function need el param, el param must be DOM Element');
+            return;
+        }
+        useCapture = useCapture || false;
+        if (el.removeEventListener) {
+            el.removeEventListener(name, fn, useCapture);
+        }
+    };
+    u.one = function(el, name, fn, useCapture){
+        if(!u.isElement(el)){
+            console.warn('$api.one Function need el param, el param must be DOM Element');
+            return;
+        }
+        useCapture = useCapture || false;
+        var that = this;
+        var cb = function(){
+            fn && fn();
+            that.rmEvt(el, name, cb, useCapture);
+        };
+        that.addEvt(el, name, cb, useCapture);
+    };
+    u.dom = function(el, selector){
+        if(arguments.length === 1 && typeof arguments[0] == 'string'){
+            if(document.querySelector){
+                return document.querySelector(arguments[0]);
+            }
+        }else if(arguments.length === 2){
+            if(el.querySelector){
+                return el.querySelector(selector);
+            }
+        }
+    };
+    u.domAll = function(el, selector){
+        if(arguments.length === 1 && typeof arguments[0] == 'string'){
+            if(document.querySelectorAll){
+                return document.querySelectorAll(arguments[0]);
+            }
+        }else if(arguments.length === 2){
+            if(el.querySelectorAll){
+                return el.querySelectorAll(selector);
+            }
+        }
+    };
+    u.byId = function(id){
+        return document.getElementById(id);
+    };
+    u.first = function(el, selector){
+        if(arguments.length === 1){
+            if(!u.isElement(el)){
+                console.warn('$api.first Function need el param, el param must be DOM Element');
+                return;
+            }
+            return el.children[0];
+        }
+        if(arguments.length === 2){
+            return this.dom(el, selector+':first-child');
+        }
+    };
+    u.last = function(el, selector){
+        if(arguments.length === 1){
+            if(!u.isElement(el)){
+                console.warn('$api.last Function need el param, el param must be DOM Element');
+                return;
+            }
+            var children = el.children;
+            return children[children.length - 1];
+        }
+        if(arguments.length === 2){
+            return this.dom(el, selector+':last-child');
+        }
+    };
+    u.eq = function(el, index){
+        return this.dom(el, ':nth-child('+ index +')');
+    };
+    u.not = function(el, selector){
+        return this.domAll(el, ':not('+ selector +')');
+    };
+    u.prev = function(el){
+        if(!u.isElement(el)){
+            console.warn('$api.prev Function need el param, el param must be DOM Element');
+            return;
+        }
+        var node = el.previousSibling;
+        if(node.nodeType && node.nodeType === 3){
+            node = node.previousSibling;
+            return node;
+        }
+    };
+    u.next = function(el){
+        if(!u.isElement(el)){
+            console.warn('$api.next Function need el param, el param must be DOM Element');
+            return;
+        }
+        var node = el.nextSibling;
+        if(node.nodeType && node.nodeType === 3){
+            node = node.nextSibling;
+            return node;
+        }
+    };
+    u.closest = function(el, selector){
+        if(!u.isElement(el)){
+            console.warn('$api.closest Function need el param, el param must be DOM Element');
+            return;
+        }
+        var doms, targetDom;
+        var isSame = function(doms, el){
+            var i = 0, len = doms.length;
+            for(i; i<len; i++){
+                if(doms[i].isEqualNode(el)){
+                    return doms[i];
+                }
+            }
+            return false;
+        };
+        var traversal = function(el, selector){
+            doms = u.domAll(el.parentNode, selector);
+            targetDom = isSame(doms, el);
+            while(!targetDom){
+                el = el.parentNode;
+                if(el != null && el.nodeType == el.DOCUMENT_NODE){
+                    return false;
+                }
+                traversal(el, selector);
+            }
+
+            return targetDom;
+        };
+
+        return traversal(el, selector);
+    };
+    u.contains = function(parent,el){
+        var mark = false;
+        if(el === parent){
+            mark = true;
+            return mark;
+        }else{
+            do{
+                el = el.parentNode;
+                if(el === parent){
+                    mark = true;
+                    return mark;
+                }
+            }while(el === document.body || el === document.documentElement);
+
+            return mark;
+        }
+        
+    };
+    u.remove = function(el){
+        if(el && el.parentNode){
+            el.parentNode.removeChild(el);
+        }
+    };
+    u.attr = function(el, name, value){
+        if(!u.isElement(el)){
+            console.warn('$api.attr Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length == 2){
+            return el.getAttribute(name);
+        }else if(arguments.length == 3){
+            el.setAttribute(name, value);
+            return el;
+        }
+    };
+    u.removeAttr = function(el, name){
+        if(!u.isElement(el)){
+            console.warn('$api.removeAttr Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length === 2){
+            el.removeAttribute(name);
+        }
+    };
+    u.hasCls = function(el, cls){
+        if(!u.isElement(el)){
+            console.warn('$api.hasCls Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(el.className.indexOf(cls) > -1){
+            return true;
+        }else{
+            return false;
+        }
+    };
+    u.addCls = function(el, cls){
+        if(!u.isElement(el)){
+            console.warn('$api.addCls Function need el param, el param must be DOM Element');
+            return;
+        }
+        if('classList' in el){
+            el.classList.add(cls);
+        }else{
+            var preCls = el.className;
+            var newCls = preCls +' '+ cls;
+            el.className = newCls;
+        }
+        return el;
+    };
+    u.removeCls = function(el, cls){
+        if(!u.isElement(el)){
+            console.warn('$api.removeCls Function need el param, el param must be DOM Element');
+            return;
+        }
+        if('classList' in el){
+            el.classList.remove(cls);
+        }else{
+            var preCls = el.className;
+            var newCls = preCls.replace(cls, '');
+            el.className = newCls;
+        }
+        return el;
+    };
+    u.toggleCls = function(el, cls){
+        if(!u.isElement(el)){
+            console.warn('$api.toggleCls Function need el param, el param must be DOM Element');
+            return;
+        }
+       if('classList' in el){
+            el.classList.toggle(cls);
+        }else{
+            if(u.hasCls(el, cls)){
+                u.addCls(el, cls);
+            }else{
+                u.removeCls(el, cls);
+            }
+        }
+        return el;
+    };
+    u.val = function(el, val){
+        if(!u.isElement(el)){
+            console.warn('$api.val Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length === 1){
+            switch(el.tagName){
+                case 'SELECT':
+                    var value = el.options[el.selectedIndex].value;
+                    return value;
+                    break;
+                case 'INPUT':
+                    return el.value;
+                    break;
+                case 'TEXTAREA':
+                    return el.value;
+                    break;
+            }
+        }
+        if(arguments.length === 2){
+            switch(el.tagName){
+                case 'SELECT':
+                    el.options[el.selectedIndex].value = val;
+                    return el;
+                    break;
+                case 'INPUT':
+                    el.value = val;
+                    return el;
+                    break;
+                case 'TEXTAREA':
+                    el.value = val;
+                    return el;
+                    break;
+            }
+        }
+        
+    };
+    u.prepend = function(el, html){
+        if(!u.isElement(el)){
+            console.warn('$api.prepend Function need el param, el param must be DOM Element');
+            return;
+        }
+        el.insertAdjacentHTML('afterbegin', html);
+        return el;
+    };
+    u.append = function(el, html){
+        if(!u.isElement(el)){
+            console.warn('$api.append Function need el param, el param must be DOM Element');
+            return;
+        }
+        el.insertAdjacentHTML('beforeend', html);
+        return el;
+    };
+    u.before = function(el, html){
+        if(!u.isElement(el)){
+            console.warn('$api.before Function need el param, el param must be DOM Element');
+            return;
+        }
+        el.insertAdjacentHTML('beforebegin', html);
+        return el;
+    };
+    u.after = function(el, html){
+        if(!u.isElement(el)){
+            console.warn('$api.after Function need el param, el param must be DOM Element');
+            return;
+        }
+        el.insertAdjacentHTML('afterend', html);
+        return el;
+    };
+    u.html = function(el, html){
+        if(!u.isElement(el)){
+            console.warn('$api.html Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length === 1){
+            return el.innerHTML;
+        }else if(arguments.length === 2){
+            el.innerHTML = html;
+            return el;
+        }
+    };
+    u.text = function(el, txt){
+        if(!u.isElement(el)){
+            console.warn('$api.text Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length === 1){
+            return el.textContent;
+        }else if(arguments.length === 2){
+            el.textContent = txt;
+            return el;
+        }
+    };
+    u.offset = function(el){
+        if(!u.isElement(el)){
+            console.warn('$api.offset Function need el param, el param must be DOM Element');
+            return;
+        }
+        var sl = Math.max(document.documentElement.scrollLeft, document.body.scrollLeft);
+        var st = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+
+        var rect = el.getBoundingClientRect();
+        return {
+            l: rect.left + sl,
+            t: rect.top + st,
+            w: el.offsetWidth,
+            h: el.offsetHeight
+        };
+    };
+    u.css = function(el, css){
+        if(!u.isElement(el)){
+            console.warn('$api.css Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(typeof css == 'string' && css.indexOf(':') > 0){
+            el.style && (el.style.cssText += ';' + css);
+        }
+    };
+    u.cssVal = function(el, prop){
+        if(!u.isElement(el)){
+            console.warn('$api.cssVal Function need el param, el param must be DOM Element');
+            return;
+        }
+        if(arguments.length === 2){
+            var computedStyle = window.getComputedStyle(el, null);
+            return computedStyle.getPropertyValue(prop);
+        }
+    };
+    u.jsonToStr = function(json){
+        if(typeof json === 'object'){
+            return JSON && JSON.stringify(json);
+        }
+    };
+    u.strToJson = function(str){
+        if(typeof str === 'string'){
+            return JSON && JSON.parse(str);
+        }
+    };
+    u.setStorage = function(key, value){
+        if(arguments.length === 2){
+            var v = value;
+            if(typeof v == 'object'){
+                v = JSON.stringify(v);
+                v = 'obj-'+ v;
+            }else{
+                v = 'str-'+ v;
+            }
+            var ls = uzStorage();
+            if(ls){
+                ls.setItem(key, v);
+            }
+        }
+    };
+    u.getStorage = function(key){
+        var ls = uzStorage();
+        if(ls){
+            var v = ls.getItem(key);
+            if(!v){return;}
+            if(v.indexOf('obj-') === 0){
+                v = v.slice(4);
+                return JSON.parse(v);
+            }else if(v.indexOf('str-') === 0){
+                return v.slice(4);
+            }
+        }
+    };
+    u.rmStorage = function(key){
+        var ls = uzStorage();
+        if(ls && key){
+            ls.removeItem(key);
+        }
+    };
+    u.clearStorage = function(){
+        var ls = uzStorage();
+        if(ls){
+            ls.clear();
+        }
+    };
+
+   
+    /*by king*/
+    u.fixIos7Bar = function(el){
+        if(!u.isElement(el)){
+            console.warn('$api.fixIos7Bar Function need el param, el param must be DOM Element');
+            return;
+        }
+        var strDM = api.systemType;
+        if (strDM == 'ios') {
+            var strSV = api.systemVersion;
+            var numSV = parseInt(strSV,10);
+            var fullScreen = api.fullScreen;
+            var iOS7StatusBarAppearance = api.iOS7StatusBarAppearance;
+            if (numSV >= 7 && !fullScreen && iOS7StatusBarAppearance) {
+                el.style.paddingTop = '20px';
+            }
+        }
+    };
+    u.fixStatusBar = function(el){
+        if(!u.isElement(el)){
+            console.warn('$api.fixStatusBar Function need el param, el param must be DOM Element');
+            return;
+        }
+        var sysType = api.systemType;
+        if(sysType == 'ios'){
+            u.fixIos7Bar(el);
+        }else if(sysType == 'android'){
+            var ver = api.systemVersion;
+            ver = parseFloat(ver);
+            if(ver >= 4.4){
+                el.style.paddingTop = '25px';
+            }
+        }
+    };
+    u.toast = function(title, text, time){
+        var opts = {};
+        var show = function(opts, time){
+            api.showProgress(opts);
+            setTimeout(function(){
+                api.hideProgress();
+            },time);
+        };
+        if(arguments.length === 1){
+            var time = time || 500;
+            if(typeof title === 'number'){
+                time = title;
+            }else{
+                opts.title = title+'';
+            }
+            show(opts, time);
+        }else if(arguments.length === 2){
+            var time = time || 500;
+            var text = text;
+            if(typeof text === "number"){
+                var tmp = text;
+                time = tmp;
+                text = null;
+            }
+            if(title){
+                opts.title = title;
+            }
+            if(text){
+                opts.text = text;
+            }
+            show(opts, time);
+        }
+        if(title){
+            opts.title = title;
+        }
+        if(text){
+            opts.text = text;
+        }
+        time = time || 500;
+        show(opts, time);
+    };
+    u.post = function(/*url,data,fnSuc,dataType*/){
+        var argsToJson = parseArguments.apply(null, arguments);
+        var json = {};
+        var fnSuc = argsToJson.fnSuc;
+        argsToJson.url && (json.url = argsToJson.url);
+        argsToJson.data && (json.data = argsToJson.data);
+        if(argsToJson.dataType){
+            var type = argsToJson.dataType.toLowerCase();
+            if (type == 'text'||type == 'json') {
+                json.dataType = type;
+            }
+        }else{
+            json.dataType = 'json';
+        }
+        json.method = 'post';
+        api.ajax(json,
+            function(ret,err){
+                if (ret) {
+                    fnSuc && fnSuc(ret);
+                }
+            }
+        );
+    };
+    u.get = function(/*url,fnSuc,dataType*/){
+        var argsToJson = parseArguments.apply(null, arguments);
+        var json = {};
+        var fnSuc = argsToJson.fnSuc;
+        argsToJson.url && (json.url = argsToJson.url);
+        //argsToJson.data && (json.data = argsToJson.data);
+        if(argsToJson.dataType){
+            var type = argsToJson.dataType.toLowerCase();
+            if (type == 'text'||type == 'json') {
+                json.dataType = type;
+            }
+        }else{
+            json.dataType = 'text';
+        }
+        json.method = 'get';
+        api.ajax(json,
+            function(ret,err){
+                if (ret) {
+                    fnSuc && fnSuc(ret);
+                }
+            }
+        );
+    };
+
+/*end*/
+    
+
+    window.$api = u;
+
+})(window);
+
+

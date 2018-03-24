@@ -12,6 +12,8 @@
 		03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096901B70E92F00D750DC /* UZFNScanner.m */; };
 		03C096961B70E92F00D750DC /* FNScannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096921B70E92F00D750DC /* FNScannerViewController.m */; };
 		03C096971B70E92F00D750DC /* UZFNBarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096941B70E92F00D750DC /* UZFNBarViewController.m */; };
+		67D13D1B2041449800884F17 /* UZCaptureNewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 67D13D1A2041449800884F17 /* UZCaptureNewVC.m */; };
+		67D13D1E20414CD900884F17 /* UZCaptureControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 67D13D1D20414CD900884F17 /* UZCaptureControlView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -94,6 +96,10 @@
 		03C096D11B70E9C100D750DC /* ZBarSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSDK.h; sourceTree = "<group>"; };
 		03C096D21B70E9C100D750DC /* ZBarSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSymbol.h; sourceTree = "<group>"; };
 		03C096D31B70EA6500D750DC /* UZDataUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZDataUtils.h; sourceTree = "<group>"; };
+		67D13D192041449800884F17 /* UZCaptureNewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UZCaptureNewVC.h; sourceTree = "<group>"; };
+		67D13D1A2041449800884F17 /* UZCaptureNewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UZCaptureNewVC.m; sourceTree = "<group>"; };
+		67D13D1C20414CD900884F17 /* UZCaptureControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UZCaptureControlView.h; sourceTree = "<group>"; };
+		67D13D1D20414CD900884F17 /* UZCaptureControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UZCaptureControlView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +138,10 @@
 				03C096901B70E92F00D750DC /* UZFNScanner.m */,
 				03AD306D1BCFB66A0099BECF /* UZCaptureVC.h */,
 				03AD306E1BCFB66A0099BECF /* UZCaptureVC.m */,
+				67D13D192041449800884F17 /* UZCaptureNewVC.h */,
+				67D13D1A2041449800884F17 /* UZCaptureNewVC.m */,
+				67D13D1C20414CD900884F17 /* UZCaptureControlView.h */,
+				67D13D1D20414CD900884F17 /* UZCaptureControlView.m */,
 				03AD306F1BCFB66A0099BECF /* UZCaptureView.h */,
 				03AD30701BCFB66A0099BECF /* UZCaptureView.m */,
 				03C096911B70E92F00D750DC /* FNScannerViewController.h */,
@@ -309,8 +319,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				03AD30711BCFB66A0099BECF /* UZCaptureVC.m in Sources */,
+				67D13D1E20414CD900884F17 /* UZCaptureControlView.m in Sources */,
 				03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */,
 				03AD30721BCFB66A0099BECF /* UZCaptureView.m in Sources */,
+				67D13D1B2041449800884F17 /* UZCaptureNewVC.m in Sources */,
 				03C096971B70E92F00D750DC /* UZFNBarViewController.m in Sources */,
 				03C096961B70E92F00D750DC /* FNScannerViewController.m in Sources */,
 			);

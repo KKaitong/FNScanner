@@ -18,11 +18,19 @@ package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.os.Build;
 import android.util.Log;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.regex.Pattern;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureActivity;
 
 @SuppressWarnings("deprecation")
 final class CameraConfigurationManager {
@@ -39,14 +47,22 @@ final class CameraConfigurationManager {
 	private Point cameraResolution;
 	private int previewFormat;
 	private String previewFormatString;
+	
+	private boolean mPortraitFlag = true;
 
 	CameraConfigurationManager(Context context) {
+		EventBus.getDefault().register(this);
 	}
+	
+	@Subscriber(tag = "reset_orientation")
+    private void updateFlag(boolean flag) {
+        mPortraitFlag = flag;
+    }
 
 	/**
 	 * Reads, one time, values from the camera that are needed by the app.
 	 */
-	void initFromCameraParameters(Camera camera, int w, int h) {
+	void initFromCameraParameters(Camera camera, int w, int h, boolean isWindow) {
 		Camera.Parameters parameters = camera.getParameters();
 		previewFormat = parameters.getPreviewFormat();
 		previewFormatString = parameters.get("preview-format");
@@ -54,16 +70,27 @@ final class CameraConfigurationManager {
 				+ previewFormatString);
 		screenResolution = new Point(w, h);
 		Log.d(TAG, "Screen resolution: " + screenResolution);
-//		Point screenResolutionForCamera = new Point();
-//		screenResolutionForCamera.x = screenResolution.x;
-//		screenResolutionForCamera.y = screenResolution.y;
-//		if (screenResolution.x < screenResolution.y) {
-//			screenResolutionForCamera.x = screenResolution.y;
-//			screenResolutionForCamera.y = screenResolution.x;
-//		}
-//		cameraResolution = getCameraResolution(parameters,
-//				screenResolutionForCamera);
-		cameraResolution = getCameraResolution(parameters, screenResolution);
+		System.out.print("Screen resolution: " + screenResolution);
+		
+		
+		//=======
+		if(!isWindow){
+			if (CaptureActivity.mOrientationFlag) {
+				Point screenResolutionForCamera = new Point();
+				screenResolutionForCamera.x = screenResolution.x;
+				screenResolutionForCamera.y = screenResolution.y;
+				if (screenResolution.x < screenResolution.y) {
+					screenResolutionForCamera.x = screenResolution.y;
+					screenResolutionForCamera.y = screenResolution.x;
+				}
+				cameraResolution = getCameraResolution(parameters, screenResolutionForCamera);
+			}else {
+				cameraResolution = getCameraResolution(parameters, screenResolution);
+			}
+		}else {
+			cameraResolution = getCameraResolution(parameters, screenResolution);
+		}
+
 		Log.d(TAG, "Camera resolution: " + screenResolution);
 	}
 
@@ -75,6 +102,7 @@ final class CameraConfigurationManager {
 	 * planar Y can be used for barcode scanning without a copy in some cases.
 	 */
 	void setDesiredCameraParameters(Camera camera) {
+		//=====old start======
 		Camera.Parameters parameters = camera.getParameters();
 		Log.d(TAG, "Setting preview size: " + cameraResolution);
 		parameters.setPreviewSize(cameraResolution.x, cameraResolution.y);
@@ -82,10 +110,15 @@ final class CameraConfigurationManager {
 				+ "  cameraResolution.y" + cameraResolution.y);
 		setFlash(parameters);
 		setZoom(parameters);
-		camera.setDisplayOrientation(90);
-		// setDisplayOrientation(camera, 90);
-		// setSharpness(parameters);
+		if (CaptureActivity.mOrientationFlag) {
+            camera.setDisplayOrientation(90);
+        }else {
+        		camera.setDisplayOrientation(0);
+        }
+//		camera.setDisplayOrientation(90);
 		camera.setParameters(parameters);
+		//=====old end======
+		
 	}
 
 	protected void setDisplayOrientation(Camera camera, int angle) {
@@ -123,9 +156,9 @@ final class CameraConfigurationManager {
 		return previewFormatString;
 	}
 
-	private static Point getCameraResolution(Camera.Parameters parameters,
-			Point screenResolution) {
+	private static Point getCameraResolution(Camera.Parameters parameters, Point screenResolution) {
 
+		//=============old start=================
 		String previewSizeValueString = parameters.get("preview-size-values");
 		// saw this on Xperia
 		if (previewSizeValueString == null) {
@@ -137,19 +170,64 @@ final class CameraConfigurationManager {
 		if (previewSizeValueString != null) {
 			Log.d(TAG, "preview-size-values parameter: "
 					+ previewSizeValueString);
-			cameraResolution = findBestPreviewSizeValue(previewSizeValueString,
-					screenResolution);
+			cameraResolution = findBestPreviewSizeValue(previewSizeValueString, screenResolution);
+			
+			//cameraResolution = findBestPreviewSizeValue(parameters, screenResolution);
 		}
+		
+		//=============old end=================
+		
+		
 
 		if (cameraResolution == null) {
 			// Ensure that the camera resolution is a multiple of 8, as the
 			// screen may not be.
-			cameraResolution = new Point((screenResolution.x >> 3) << 3,
-					(screenResolution.y >> 3) << 3);
+			cameraResolution = new Point((screenResolution.x >> 3) << 3, (screenResolution.y >> 3) << 3);
 		}
 
 		return cameraResolution;
 	}
+	
+	//new
+//	private static Point findBestPreviewSizeValue(Camera.Parameters parameters, Point screenResolution) {
+//		Point point = null;
+//
+//        Rect frame = CameraManager.get().getFramingRect();
+//        int frameSize = frame.right - frame.left;
+//        int discountMax = Integer.MAX_VALUE;
+//        int width = 0;
+//        int height = 0;
+//        List<Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+//        for (Size size : supportedPreviewSizes) {
+//            int discount = size.height - frameSize;
+//            if (discount > 0 && size.height * screenResolution.x == screenResolution.y * size.width) {
+//                if (discount < discountMax) {
+//                    discountMax = discount;
+//                    width = size.width;
+//                    height = size.height;
+//                }
+//            }
+//        }
+//        if (width * height != 0) {
+//            point = new Point(width, height);
+//        }
+//        if (point == null) {
+//            String previewSizeValueString = parameters.get("preview-size-values");
+//            // saw this on Xperia
+//            if (previewSizeValueString == null) {
+//                previewSizeValueString = parameters.get("preview-size-value");
+//            }
+//
+//            if (previewSizeValueString != null) {
+//                Log.d(TAG, "preview-size-values parameter: " + previewSizeValueString);
+//                return findBestPreviewSizeValue(previewSizeValueString, screenResolution);
+//            } else {
+//                return null;
+//            }
+//        } else {
+//            return point;
+//        }
+//	}
 
 	private static Point findBestPreviewSizeValue(
 			CharSequence previewSizeValueString, Point screenResolution) {

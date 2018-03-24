@@ -23,6 +23,10 @@ public final class ViewfinderResultPointCallback implements ResultPointCallback 
 
   public ViewfinderResultPointCallback(ViewfinderView viewfinderView) {
   }
+  
+  public ViewfinderResultPointCallback() {
+	  
+  }
 
   public void foundPossibleResultPoint(ResultPoint point) {
   }

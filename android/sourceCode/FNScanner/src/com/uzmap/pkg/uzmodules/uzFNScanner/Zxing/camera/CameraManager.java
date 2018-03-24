@@ -18,11 +18,19 @@ package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera;
 
 import java.io.IOException;
 
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import com.uzmap.pkg.a.a.f;
+import com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner;
+import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureActivity;
+
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.OnZoomChangeListener;
 import android.hardware.Camera.Parameters;
 import android.os.Build;
 import android.os.Handler;
@@ -61,14 +69,14 @@ public final class CameraManager {
 	private final CameraConfigurationManager configManager;
 	private Camera camera;
 	private Rect framingRect;
+	private Rect framingLandRect;
 	private Rect framingRectInPreview;
 	private boolean initialized;
 	private boolean previewing;
 	private final boolean useOneShotPreviewCallback;
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered
-	 * handler. Make sure to clear the handler so it will only receive one
-	 * message.
+	 * handler. Make sure to clear the handler so it will only receive one message.
 	 */
 	private final PreviewCallback previewCallback;
 	/**
@@ -86,9 +94,10 @@ public final class CameraManager {
 	 *            The Activity which wants to use the camera.
 	 */
 	public static void init(Context context) {
-		if (cameraManager == null) {
-			cameraManager = new CameraManager(context);
-		}
+		// if (cameraManager == null) {
+		// cameraManager = new CameraManager(context);
+		// }
+		cameraManager = new CameraManager(context);
 	}
 
 	/**
@@ -100,9 +109,11 @@ public final class CameraManager {
 		return cameraManager;
 	}
 
+	private Context mContext;
+
 	private CameraManager(Context context) {
 		this.configManager = new CameraConfigurationManager(context);
-
+		this.mContext = context;
 		// Camera.setOneShotPreviewCallback() has a race condition in Cupcake,
 		// so we use the older
 		// Camera.setPreviewCallback() on 1.5 and earlier. For Donut and later,
@@ -117,22 +128,28 @@ public final class CameraManager {
 																				// =
 																				// Cupcake
 
-		previewCallback = new PreviewCallback(configManager,
-				useOneShotPreviewCallback);
+		previewCallback = new PreviewCallback(configManager, useOneShotPreviewCallback);
 		autoFocusCallback = new AutoFocusCallback();
+
+		EventBus.getDefault().register(this);
+	}
+
+	private boolean mPortraitFlag = true;
+
+	@Subscriber(tag = "reset_orientation")
+	private void updateFlag(boolean flag) {
+		mPortraitFlag = flag;
 	}
 
 	/**
 	 * Opens the camera driver and initializes the hardware parameters.
 	 * 
 	 * @param holder
-	 *            The surface object which the camera will draw preview frames
-	 *            into.
+	 *            The surface object which the camera will draw preview frames into.
 	 * @throws IOException
 	 *             Indicates the camera driver failed to open.
 	 */
-	public void openDriver(SurfaceHolder holder, int w, int h)
-			throws IOException {
+	public void openDriver(SurfaceHolder holder, int w, int h, boolean isWindow) throws IOException {
 		if (camera == null) {
 			camera = Camera.open();
 			if (camera == null) {
@@ -142,7 +159,7 @@ public final class CameraManager {
 
 			if (!initialized) {
 				initialized = true;
-				configManager.initFromCameraParameters(camera, w, h);
+				configManager.initFromCameraParameters(camera, w, h, isWindow);
 			}
 			configManager.setDesiredCameraParameters(camera);
 
@@ -201,8 +218,8 @@ public final class CameraManager {
 
 	/**
 	 * A single preview frame will be returned to the handler supplied. The data
-	 * will arrive as byte[] in the message.obj field, with width and height
-	 * encoded as message.arg1 and message.arg2, respectively.
+	 * will arrive as byte[] in the message.obj field, with width and height encoded
+	 * as message.arg1 and message.arg2, respectively.
 	 * 
 	 * @param handler
 	 *            The handler to send the message to.
@@ -237,10 +254,9 @@ public final class CameraManager {
 	}
 
 	/**
-	 * Calculates the framing rect which the UI should draw to show the user
-	 * where to place the barcode. This target helps with alignment as well as
-	 * forces the user to hold the device far enough away to ensure the image
-	 * will be in focus.
+	 * Calculates the framing rect which the UI should draw to show the user where
+	 * to place the barcode. This target helps with alignment as well as forces the
+	 * user to hold the device far enough away to ensure the image will be in focus.
 	 * 
 	 * @return The rectangle to draw on screen in window coordinates.
 	 */
@@ -255,34 +271,115 @@ public final class CameraManager {
 				int width = screenResolution.x * 7 / 10;
 				int height = screenResolution.y * 7 / 10;
 
+				if (height >= width) { // 竖屏
+					height = width;
+				} else { // 横屏
+					width = height;
+				}
+
 				int leftOffset = (screenResolution.x - width) / 2;
 				int topOffset = (screenResolution.y - height) / 3;
-				framingRect = new Rect(leftOffset, topOffset, leftOffset
-						+ width, topOffset + height);
+				// framingRect = new Rect(leftOffset, topOffset + 250, leftOffset + width,
+				// topOffset + height - 400);
+				framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+				// framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset +
+				// height);
 
 				// 原生
-//				int width = screenResolution.x * 3 / 4;
-//				if (width < MIN_FRAME_WIDTH) {
-//					width = MIN_FRAME_WIDTH;
-//				} else if (width > MAX_FRAME_WIDTH) {
-//					width = MAX_FRAME_WIDTH;
-//				}
-//				int height = screenResolution.y * 3 / 4;
-//				if (height < MIN_FRAME_HEIGHT) {
-//					height = MIN_FRAME_HEIGHT;
-//				} else if (height > MAX_FRAME_HEIGHT) {
-//					height = MAX_FRAME_HEIGHT;
-//				}
-//				int leftOffset = (screenResolution.x - width) / 2;
-//				int topOffset = (screenResolution.y - height) / 2;
-//				framingRect = new Rect(leftOffset, topOffset, leftOffset
-//						+ width, topOffset + height);
-				Log.d(TAG, "Calculated framing rect: " + framingRect);
+				// int width = screenResolution.x * 3 / 4;
+				// if (width < MIN_FRAME_WIDTH) {
+				// width = MIN_FRAME_WIDTH;
+				// } else if (width > MAX_FRAME_WIDTH) {
+				// width = MAX_FRAME_WIDTH;
+				// }
+				// int height = screenResolution.y * 3 / 4;
+				// if (height < MIN_FRAME_HEIGHT) {
+				// height = MIN_FRAME_HEIGHT;
+				// } else if (height > MAX_FRAME_HEIGHT) {
+				// height = MAX_FRAME_HEIGHT;
+				// }
+				// int leftOffset = (screenResolution.x - width) / 2;
+				// int topOffset = (screenResolution.y - height) / 2;
+				// framingRect = new Rect(leftOffset, topOffset, leftOffset
+				// + width, topOffset + height);
+				Log.e(TAG, "Calculated framing rect: " + framingRect);
 			}
 
 		}
 		return framingRect;
 	}
+
+	public Rect getLandFramingRect() {
+		Point screenResolution = configManager.getScreenResolution();
+		if (screenResolution != null) {
+			if (framingLandRect == null) {
+				if (camera == null) {
+					return null;
+				}
+
+				// int width = screenResolution.x * 7;
+				// int height = screenResolution.y * 7 / 10;
+
+				// if(height >= width) { //竖屏
+				// height = width;
+				// } else { //横屏
+				// width = height;
+				// }
+
+				// int leftOffset = (screenResolution.x - width) / 2;
+				// int topOffset = (screenResolution.y - height) / 3;
+				// framingLandRect = new Rect(leftOffset, topOffset, leftOffset + width,
+				// topOffset + height);
+
+				// 原生
+				int width = screenResolution.x * 3 / 4;
+				// if (width < MIN_FRAME_WIDTH) {
+				// width = MIN_FRAME_WIDTH;
+				// } else if (width > MAX_FRAME_WIDTH) {
+				// width = MAX_FRAME_WIDTH;
+				// }
+				int height = screenResolution.y * 3 / 4;
+				// if (height < MIN_FRAME_HEIGHT) {
+				// height = MIN_FRAME_HEIGHT;
+				// } else if (height > MAX_FRAME_HEIGHT) {
+				// height = MAX_FRAME_HEIGHT;
+				// }
+				int leftOffset = (screenResolution.x - width) / 2;
+				int topOffset = (screenResolution.y - height) / 2;
+				framingLandRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+				Log.e(TAG, "Calculated framing rect: " + framingLandRect);
+			}
+
+		}
+		return framingLandRect;
+	}
+
+	// public Rect getFramingRect() {
+	// Point screenResolution = configManager.getScreenResolution();
+	// if (framingRect == null) {
+	// if (camera == null) {
+	// return null;
+	// }
+	// int width = screenResolution.x * 3 / 4;
+	// if (width < MIN_FRAME_WIDTH) {
+	// width = MIN_FRAME_WIDTH;
+	// } else if (width > MAX_FRAME_WIDTH) {
+	// width = MAX_FRAME_WIDTH;
+	// }
+	// int height = screenResolution.y * 3 / 4;
+	// if (height < MIN_FRAME_HEIGHT) {
+	// height = MIN_FRAME_HEIGHT;
+	// } else if (height > MAX_FRAME_HEIGHT) {
+	// height = MAX_FRAME_HEIGHT;
+	// }
+	// int leftOffset = (screenResolution.x - width) / 2;
+	// int topOffset = (screenResolution.y - height) / 2;
+	// framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset +
+	// height);
+	// Log.d(TAG, "Calculated framing rect: " + framingRect);
+	// }
+	// return framingRect;
+	// }
 
 	/**
 	 * Like {@link #getFramingRect} but coordinates are in terms of the preview
@@ -293,18 +390,29 @@ public final class CameraManager {
 			Rect rect = new Rect(getFramingRect());
 			Point cameraResolution = configManager.getCameraResolution();
 			Point screenResolution = configManager.getScreenResolution();
-//			rect.left = rect.left * cameraResolution.x / screenResolution.x;
-//			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-//			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-//			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+			// rect.left = rect.left * cameraResolution.x / screenResolution.x;
+			// rect.right = rect.right * cameraResolution.x / screenResolution.x;
+			// rect.top = rect.top * cameraResolution.y / screenResolution.y;
+			// rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
 
-			// 竖屏
-			 rect.left = rect.left * cameraResolution.y / screenResolution.x;
-			 rect.right = rect.right * cameraResolution.y /
-			 screenResolution.x;
-			 rect.top = rect.top * cameraResolution.x / screenResolution.y;
-			 rect.bottom = rect.bottom * cameraResolution.x /
-			 screenResolution.y;
+			if (UzFNScanner.isWindow) {
+				rect.left = rect.left * cameraResolution.y / screenResolution.x;
+				rect.right = rect.right * cameraResolution.y / screenResolution.x;
+				rect.top = rect.top * cameraResolution.x / screenResolution.y;
+				rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
+			} else {
+				if (mPortraitFlag) {
+					rect.left = rect.left * cameraResolution.y / screenResolution.x;
+					rect.right = rect.right * cameraResolution.y / screenResolution.x;
+					rect.top = rect.top * cameraResolution.x / screenResolution.y;
+					rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
+				} else {
+					rect.left = rect.left * cameraResolution.x / screenResolution.x;
+					rect.right = rect.right * cameraResolution.x / screenResolution.x;
+					rect.top = rect.top * cameraResolution.y / screenResolution.y;
+					rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+				}
+			}
 
 			framingRectInPreview = rect;
 		}
@@ -318,21 +426,20 @@ public final class CameraManager {
 	 * @param points
 	 *            The points returned by the Reader subclass through
 	 *            Result.getResultPoints().
-	 * @return An array of Points scaled to the size of the framing rect and
-	 *         offset appropriately so they can be drawn in screen coordinates.
+	 * @return An array of Points scaled to the size of the framing rect and offset
+	 *         appropriately so they can be drawn in screen coordinates.
 	 */
 	/*
 	 * public Point[] convertResultPoints(ResultPoint[] points) { Rect frame =
-	 * getFramingRectInPreview(); int count = points.length; Point[] output =
-	 * new Point[count]; for (int x = 0; x < count; x++) { output[x] = new
-	 * Point(); output[x].x = frame.left + (int) (points[x].getX() + 0.5f);
-	 * output[x].y = frame.top + (int) (points[x].getY() + 0.5f); } return
-	 * output; }
+	 * getFramingRectInPreview(); int count = points.length; Point[] output = new
+	 * Point[count]; for (int x = 0; x < count; x++) { output[x] = new Point();
+	 * output[x].x = frame.left + (int) (points[x].getX() + 0.5f); output[x].y =
+	 * frame.top + (int) (points[x].getY() + 0.5f); } return output; }
 	 */
 
 	/**
-	 * A factory method to build the appropriate LuminanceSource object based on
-	 * the format of the preview buffers, as described by Camera.Parameters.
+	 * A factory method to build the appropriate LuminanceSource object based on the
+	 * format of the preview buffers, as described by Camera.Parameters.
 	 * 
 	 * @param data
 	 *            A preview frame.
@@ -342,8 +449,7 @@ public final class CameraManager {
 	 *            The height of the image.
 	 * @return A PlanarYUVLuminanceSource instance.
 	 */
-	public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data,
-			int width, int height) {
+	public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
 		Rect rect = getFramingRectInPreview();
 		int previewFormat = configManager.getPreviewFormat();
 		String previewFormatString = configManager.getPreviewFormatString();
@@ -356,20 +462,18 @@ public final class CameraManager {
 			// we only care
 			// about the Y channel, so allow it.
 		case PixelFormat.YCbCr_422_SP:
-			return new PlanarYUVLuminanceSource(data, width, height, rect.left,
-					rect.top, rect.width(), rect.height());
+			return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top, rect.width(), rect.height());
 		default:
 			// The Samsung Moment incorrectly uses this variant instead of the
 			// 'sp' version.
 			// Fortunately, it too has all the Y data up front, so we can read
 			// it.
 			if ("yuv420p".equals(previewFormatString)) {
-				return new PlanarYUVLuminanceSource(data, width, height,
-						rect.left, rect.top, rect.width(), rect.height());
+				return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top, rect.width(),
+						rect.height());
 			}
 		}
-		throw new IllegalArgumentException("Unsupported picture format: "
-				+ previewFormat + '/' + previewFormatString);
+		throw new IllegalArgumentException("Unsupported picture format: " + previewFormat + '/' + previewFormatString);
 	}
 
 	public void openLight() {
