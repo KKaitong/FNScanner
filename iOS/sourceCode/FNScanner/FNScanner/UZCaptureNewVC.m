@@ -1,13 +1,14 @@
-//
-//  UZCaptureNewVC.m
-//  FNScanner
-//
-//  Created by 郑连乐 on 2018/2/24.
-//  Copyright © 2018年 apicloud. All rights reserved.
-//
+/**
+  * APICloud Modules
+  * Copyright (c) 2014-2018 by APICloud, Inc. All Rights Reserved.
+  * Licensed under the terms of the The MIT License (MIT).
+  * Please see the license.html included with this distribution for details.
+  */
 
 #import "UZCaptureNewVC.h"
 #import "UZCaptureControlView.h"
+
+#define iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
 
 @interface UZCaptureNewVC ()
 
@@ -24,6 +25,9 @@
     if (!_controlView) {
         UZCaptureControlView * controlView = [[UZCaptureControlView alloc] init];
         [self.view addSubview:controlView];
+        controlView.hintText = self.hintText;
+        controlView.verticalLineColor = self.verticalLineColor;
+        controlView.landscapeLineColor = self.landscapeLineColor;
         _controlView = controlView;
     }
     return _controlView;

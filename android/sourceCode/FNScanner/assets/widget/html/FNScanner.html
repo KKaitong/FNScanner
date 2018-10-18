@@ -50,6 +50,10 @@
 			<div tapmode="active" onclick="fnOpenView1()">
 				打开自定义扫描(有宽高)
 			</div>
+			
+			<div tapmode="active" onclick="openView_Test()">
+				openView_Test
+			</div>
 				
 			<div tapmode="active" onclick="fnSetFrame()">
 				重设位置
@@ -82,7 +86,7 @@
 	
 		apiready = function() {
 			var FNScanner = api.require('FNScanner');
-			
+						
 			api.addEventListener({
 					name:'resume'
 				}, function(ret, err){    
@@ -101,16 +105,12 @@
 			var FNScanner = api.require('FNScanner');
 			FNScanner.openScanner({
 				autorotation : false,  //是否自动旋转
-				saveToAlbum:true,     //是否自动保存相册
-				saveImg:{
-				    path: 'fs://a.jpg',  //字符串类型；保存的文件路径；若路径不存在，则创建此路径，只支持fs://协议
-				    w: 200,              //（可选项）数字类型；生成图片的宽度，默认：200
-				    h: 200               //（可选项）数字类型；生成图片的高度，默认：200
-				}
+				hintText:'扫描'
 			}, function(ret, err) {
 				if (ret) {
-					//alert(JSON.stringify(ret));
-					api.openWin({name:'FNScanner2', url:'FNScanner2.html'});
+					console.log(JSON.stringify(ret));
+					alert(JSON.stringify(ret));
+					//api.openWin({name:'FNScanner2', url:'FNScanner2.html'});
 				} else {
 					alert(JSON.stringify(err));
 				}
@@ -154,19 +154,36 @@
 				{
 				    x: 0,   //（可选项）数字类型；模块左上角的 x 坐标（相对于所属的 Window 或 Frame）；默认：0
 				    y: 0,   //（可选项）数字类型；模块左上角的 y 坐标（相对于所属的 Window 或 Frame）；默认：0
-				    w: api.winWidth/2, //（可选项）数字类型；模块的宽度；默认：所属的 Window 或 Frame 的宽度
-				    h: api.winHeight/2  //（可选项）数字类型；模块的高度；默认：所属的 Window 或 Frame 的高度
+				    w: api.frameWidth, //（可选项）数字类型；模块的宽度；默认：所属的 Window 或 Frame 的宽度
+				    h: api.frameHeight  //（可选项）数字类型；模块的高度；默认：所属的 Window 或 Frame 的高度
 				},
 			    autorotation: true,
-			    saveToAlbum:true,//是否保存到相册
+			    saveToAlbum:false,//是否保存到相册
 			    saveImg:
 			    {
 				    path: 'fs://a.jpg',   // 字符串类型；保存的文件路径；若路径不存在，则创建此路径，只支持 fs:// 协议
 				    w: 200,               //（可选项）数字类型；生成图片的宽度，默认：200
 				    h: 200                //（可选项）数字类型；生成图片的高度，默认：200
 				},
-				fixedOn:api.frameName,
-				fixed:true
+				//fixedOn:api.frameName,
+				//fixed:true
+			}, function(ret, err) {
+			    if (ret) {
+			        //alert(JSON.stringify(ret));
+			        //console.log(JSON.stringify(ret));
+			        api.toast({msg:JSON.stringify(ret)});
+			    } else {
+			        //alert(JSON.stringify(err));
+			        console.log(JSON.stringify(err));
+			        
+			    }
+			});
+		}
+		
+		function openView_Test(){
+			var FNScanner = api.require('FNScanner');
+			FNScanner.openView({
+			    autorotation: true,			    
 			}, function(ret, err) {
 			    if (ret) {
 			        alert(JSON.stringify(ret));

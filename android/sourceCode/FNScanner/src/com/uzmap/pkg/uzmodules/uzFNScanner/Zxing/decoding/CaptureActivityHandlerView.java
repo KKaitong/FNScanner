@@ -134,7 +134,7 @@ public final class CaptureActivityHandlerView extends Handler {
 		removeMessages(decode_failed);
 	}
 
-	private void restartPreviewAndDecode() {
+	public void restartPreviewAndDecode() {
 		int decode = UZResourcesIDFinder.getResIdID("fn_decode");
 		int auto_focus = UZResourcesIDFinder.getResIdID("fn_auto_focus");
 

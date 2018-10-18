@@ -1,14 +1,16 @@
-//
-//  UZCaptureControlView.m
-//  FNScanner
-//
-//  Created by 郑连乐 on 2018/2/24.
-//  Copyright © 2018年 apicloud. All rights reserved.
-//
+/**
+  * APICloud Modules
+  * Copyright (c) 2014-2018 by APICloud, Inc. All Rights Reserved.
+  * Licensed under the terms of the The MIT License (MIT).
+  * Please see the license.html included with this distribution for details.
+  */
 
 #import "UZCaptureControlView.h"
-
+#import "UZAppUtils.h"
 #define iPhoneX ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1125, 2436), [[UIScreen mainScreen] currentMode].size) : NO)
+
+#define  kStatusBarHeight (iPhoneX ? 44.f : 20.f)
+
 #define ScanAnimationDuration 2.0
 
 static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControlViewAnimationScan";
@@ -20,16 +22,29 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
 @property (nonatomic, weak) UIView * leftView;
 @property (nonatomic, weak) UIView * rightView;
 @property (nonatomic, weak) UIImageView * imageView;
-
+@property (nonatomic, strong) UILabel * tipLabel;
 @end 
 
 @implementation UZCaptureControlView
-
+{
+    
+    //适配ipx
+    CGFloat ipx_h_top ; //上面
+    CGFloat ipx_h ;     //间距
+    CGFloat ipx_cross_x ; //返回相册y轴间距
+    CGFloat ipx_cross_y ; //返回相册y轴间距
+}
 #pragma mark - override
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
+        //适配ipx
+        ipx_h_top = 0; //上面
+        ipx_h = 0;     //间距
+        ipx_cross_x = 0; //返回相册y轴间距
+        ipx_cross_y = 0; //返回相册y轴间距
+        
         self.backgroundColor = [UIColor clearColor];
         [self setUpSubview];
     }
@@ -102,11 +117,16 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     // 文字提示
     UILabel * tipLabel = [self viewWithTag:106];
     tipLabel.frame = CGRectMake(0,height - downViewHeight + 20, width, 15);
-    
+    tipLabel.hidden = NO;
     // 重置扫描条动画
     [self removeScanAnimation];
     self.imageView.frame = CGRectMake(leftViewWidth + 5, upViewHeight, width - leftViewWidth * 2 - 5 * 2, 3);
-    self.imageView.image = [self getImage:@"saomiao"];
+    UIImage *image = [self getImage:@"saomiao"];
+    self.imageView.image = image;
+    if (![self.verticalLineColor isEqualToString:@""]) {
+        self.imageView.image = [image imageWithRenderingMode:(UIImageRenderingModeAlwaysTemplate)];
+        [self.imageView setTintColor:[UZAppUtils colorFromNSString:self.verticalLineColor]];
+    }
     [self startScanAnimationWithFromValue:@(upViewHeight) toValue:@(height - downViewHeight)];
 }
 
@@ -158,11 +178,17 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     // 文字提示
     UILabel * tipLabel = [self viewWithTag:106];
     tipLabel.frame = CGRectMake(0,height - upViewHeight + 20, width, 15);
-    
+    tipLabel.hidden = YES;
     // 重置扫描条动画
     [self removeScanAnimation];
     self.imageView.frame = CGRectMake(leftViewWidth + 5, upViewHeight, width - leftViewWidth * 2 - 5 * 2, 3);
-    self.imageView.image = [self getImage:@"saomiaov"];
+    UIImage *image = [self getImage:@"saomiao"];
+    self.imageView.image = image;
+    if (![self.landscapeLineColor isEqualToString:@""]) {
+        self.imageView.image = [image imageWithRenderingMode:(UIImageRenderingModeAlwaysTemplate)];
+        [self.imageView setTintColor:[UZAppUtils colorFromNSString:self.landscapeLineColor]];
+    }
+   
     [self startScanAnimationWithFromValue:@(upViewHeight) toValue:@(height - upViewHeight)];
 }
 
@@ -170,15 +196,32 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
 
 - (void)setUpSubview
 {
+    if (iPhoneX) {
+        ipx_h_top = 40;
+        ipx_h = 70;
+    }
+    //适配横屏竖屏
+    UIInterfaceOrientation status = [[UIApplication sharedApplication] statusBarOrientation];
+    if (status == UIInterfaceOrientationPortrait) {
+        ipx_cross_y = kStatusBarHeight;
+        ipx_h_top = 0;
+        ipx_h = 0;
+    }else if (status == UIInterfaceOrientationLandscapeLeft || status == UIInterfaceOrientationLandscapeRight){
+        ipx_cross_x = kStatusBarHeight - 20;
+        ipx_cross_y = 10;
+    }
+
+    
     // 上
-    CGFloat upViewHeight = 156 * ScreenHeight / 667;
+    CGFloat upViewHeight = (156 * ScreenHeight / 667)-ipx_h_top;
+    
     UIView * upView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, upViewHeight)];
     upView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.4];
     [self addSubview:upView];
     self.upView = upView;
     
     // 下
-    CGFloat downViewHeight = 214 * ScreenHeight / 667;
+    CGFloat downViewHeight = (214 * ScreenHeight / 667)-ipx_h;
     UIView * downView = [[UIView alloc] initWithFrame:CGRectMake(0, ScreenHeight - downViewHeight, ScreenWidth, downViewHeight)];
     downView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.4];
     [self addSubview:downView];
@@ -200,13 +243,13 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     // 返回按钮
     UIButton * backButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [backButton setImage:[self getImage:@"back"] forState:UIControlStateNormal];
-    backButton.frame =  iPhoneX ? CGRectMake(0, 29 + 24, 40, 40) : CGRectMake(0, 29, 40, 40);
+    backButton.frame =  CGRectMake(ipx_cross_x, ipx_cross_y, 40, 40);
     [self addSubview:backButton];
     self.backButton = backButton;
     
     // 相册按钮
     UIButton * albumButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    albumButton.frame = iPhoneX ? CGRectMake(ScreenWidth - 8.5 - 40, 29.5 + 24, 40, 40) : CGRectMake(ScreenWidth - 8.5 - 40, 29.5, 40, 40);
+    albumButton.frame = CGRectMake(ScreenWidth - 8.5 - 40-ipx_cross_x, ipx_cross_y, 40, 40);
     [albumButton setTitle:@"相册" forState:UIControlStateNormal];
     [albumButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     albumButton.titleLabel.font = [UIFont fontWithName:@"PingFangSC-Regular" size:14];
@@ -253,11 +296,11 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     
     // 文字提示
     UILabel * tipLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,ScreenHeight - downViewHeight + 20, ScreenWidth, 15)];
-    tipLabel.text = @"对准条形码/二维码，即可自动扫描";
     tipLabel.textColor = [UIColor whiteColor];
     tipLabel.textAlignment = NSTextAlignmentCenter;
     tipLabel.font = [UIFont fontWithName:@"PingFangSC-Regular" size:14];
     [self addSubview:tipLabel];
+    self.tipLabel = tipLabel;
     tipLabel.tag = 106;
     
     // 四个角
@@ -275,7 +318,10 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     
     // 扫描条
     UIImageView * imageView = [[UIImageView alloc] init];
-    imageView.image = [self getImage:@"saomiao"];
+    UIImage *image = [self getImage:@"saomiao"];
+    imageView.image = image;
+//    imageView.image = [image imageWithRenderingMode:(UIImageRenderingModeAlwaysTemplate)];
+//    [imageView setTintColor:[UIColor redColor]];
     imageView.frame = CGRectMake(leftViewWidth + 5, upViewHeight, ScreenWidth - leftViewWidth * 2 - 5 * 2, 3);
     [self addSubview:imageView];
     self.imageView = imageView;
@@ -283,6 +329,9 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
 
 - (void)startScanAnimationWithFromValue:(id)fromValue toValue:(id)toValue
 {
+    fromValue = @([fromValue floatValue]-ipx_h_top);
+    toValue = @([toValue floatValue]+ipx_h);
+
     CABasicAnimation * basicAnimation = [CABasicAnimation animation];
     basicAnimation.keyPath = @"position.y";
     basicAnimation.fromValue = fromValue;
@@ -299,5 +348,16 @@ static NSString * const kUZCaptureControlViewAnimationScan = @"kUZCaptureControl
     NSString *path = [[NSBundle mainBundle] pathForResource:pathName ofType:@"png"];
     return [UIImage imageWithContentsOfFile:path];
 }
-
+- (void)setHintText:(NSString *)hintText{
+    if (_hintText != hintText) {
+        _hintText = hintText;
+        
+        self.tipLabel.text = hintText;
+//        //适配横屏竖屏
+//        UIInterfaceOrientation status = [[UIApplication sharedApplication] statusBarOrientation];
+//        if (status == UIInterfaceOrientationPortrait) {
+//            self.tipLabel.text = hintText;
+//        }
+    }
+}
 @end

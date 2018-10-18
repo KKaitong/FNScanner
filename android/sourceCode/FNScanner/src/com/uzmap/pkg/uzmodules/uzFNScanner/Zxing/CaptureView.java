@@ -183,8 +183,9 @@ public class CaptureView extends FrameLayout implements Callback {
 //		mInactivityTimer.onActivity();
 		mBeepUtil.playBeepSoundAndVibrate();
 		String savePath = null;
-		ScanUtil.scanResult2img(obj.getText(), mSavePath, mSaveW, mSaveH,
-				mIsSaveToAlbum, false, mContext);
+		
+		ScanUtil.scanResult2img(obj.getText(), mSavePath, mSaveW, mSaveH,mIsSaveToAlbum, false, mContext);
+		
 		if (!isBlank(mSavePath)) {
 			savePath = new File(mSavePath).getAbsolutePath();
 		}
@@ -229,7 +230,10 @@ public class CaptureView extends FrameLayout implements Callback {
 			object.put("content", result);
 			object.put("eventType", "success");
 			mModuleContext.success(object, false);
-			mUzFNScanner.openDIYScanner(mModuleContext);
+			
+			//mUzFNScanner.openDIYScanner(mModuleContext);
+			
+			mHandler.restartPreviewAndDecode();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

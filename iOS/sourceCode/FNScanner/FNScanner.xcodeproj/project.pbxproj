@@ -12,6 +12,8 @@
 		03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096901B70E92F00D750DC /* UZFNScanner.m */; };
 		03C096961B70E92F00D750DC /* FNScannerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096921B70E92F00D750DC /* FNScannerViewController.m */; };
 		03C096971B70E92F00D750DC /* UZFNBarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 03C096941B70E92F00D750DC /* UZFNBarViewController.m */; };
+		457AD120213EC149007A8DE4 /* JQImageCropperViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 457AD11E213EC148007A8DE4 /* JQImageCropperViewController.m */; };
+		4592BF9D21400A000090B251 /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4592BF9B21400A000090B251 /* UIImage+FixOrientation.m */; };
 		67D13D1B2041449800884F17 /* UZCaptureNewVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 67D13D1A2041449800884F17 /* UZCaptureNewVC.m */; };
 		67D13D1E20414CD900884F17 /* UZCaptureControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = 67D13D1D20414CD900884F17 /* UZCaptureControlView.m */; };
 /* End PBXBuildFile section */
@@ -96,6 +98,10 @@
 		03C096D11B70E9C100D750DC /* ZBarSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSDK.h; sourceTree = "<group>"; };
 		03C096D21B70E9C100D750DC /* ZBarSymbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZBarSymbol.h; sourceTree = "<group>"; };
 		03C096D31B70EA6500D750DC /* UZDataUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UZDataUtils.h; sourceTree = "<group>"; };
+		457AD11E213EC148007A8DE4 /* JQImageCropperViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JQImageCropperViewController.m; sourceTree = "<group>"; };
+		457AD11F213EC148007A8DE4 /* JQImageCropperViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JQImageCropperViewController.h; sourceTree = "<group>"; };
+		4592BF9B21400A000090B251 /* UIImage+FixOrientation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+FixOrientation.m"; sourceTree = "<group>"; };
+		4592BF9C21400A000090B251 /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+FixOrientation.h"; sourceTree = "<group>"; };
 		67D13D192041449800884F17 /* UZCaptureNewVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UZCaptureNewVC.h; sourceTree = "<group>"; };
 		67D13D1A2041449800884F17 /* UZCaptureNewVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UZCaptureNewVC.m; sourceTree = "<group>"; };
 		67D13D1C20414CD900884F17 /* UZCaptureControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UZCaptureControlView.h; sourceTree = "<group>"; };
@@ -148,6 +154,10 @@
 				03C096921B70E92F00D750DC /* FNScannerViewController.m */,
 				03C096931B70E92F00D750DC /* UZFNBarViewController.h */,
 				03C096941B70E92F00D750DC /* UZFNBarViewController.m */,
+				457AD11F213EC148007A8DE4 /* JQImageCropperViewController.h */,
+				457AD11E213EC148007A8DE4 /* JQImageCropperViewController.m */,
+				4592BF9C21400A000090B251 /* UIImage+FixOrientation.h */,
+				4592BF9B21400A000090B251 /* UIImage+FixOrientation.m */,
 				03C0969C1B70E9C100D750DC /* ZBarSDK */,
 			);
 			path = FNScanner;
@@ -319,6 +329,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				03AD30711BCFB66A0099BECF /* UZCaptureVC.m in Sources */,
+				4592BF9D21400A000090B251 /* UIImage+FixOrientation.m in Sources */,
+				457AD120213EC149007A8DE4 /* JQImageCropperViewController.m in Sources */,
 				67D13D1E20414CD900884F17 /* UZCaptureControlView.m in Sources */,
 				03C096951B70E92F00D750DC /* UZFNScanner.m in Sources */,
 				03AD30721BCFB66A0099BECF /* UZCaptureView.m in Sources */,

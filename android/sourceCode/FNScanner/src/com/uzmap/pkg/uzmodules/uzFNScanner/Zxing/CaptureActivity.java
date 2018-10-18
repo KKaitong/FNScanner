@@ -81,6 +81,7 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 		int rotation = getDisplayRotation();
 		Intent intent = getIntent();
 		isNewUI = intent.getBooleanExtra("isNewUI", true);
+		String lineColor = intent.getStringExtra("lineColor");
 		if (isNewUI) {
 			if (rotation == 90) {
 				setContentView(getLayoutId());
@@ -97,7 +98,7 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 		
 		init();
 		initParams();
-		initView();
+		initView(lineColor);
 		//setOrientation();
 		initOrientation();
 		
@@ -147,8 +148,9 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 		}
 	}
 
-	private void initView() {
+	private void initView(String lineColor) {
 		mViewfinderView = (ViewfinderView) findViewById(finderViewId());
+		mViewfinderView.setLineColor(lineColor);
 		mRlRoot = (RelativeLayout) findViewById(UZResourcesIDFinder.getResIdID("rl_root"));
 		findViewById(backBtnId()).setOnClickListener(this);
 		findViewById(selectImgBtnId()).setOnClickListener(this);
@@ -215,7 +217,7 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 	}
 
 	private void handleDecodeFinish(String savePath, String albumPath,
-			Result obj) {
+			final Result obj) {
 		Intent data = new Intent();
 		if (savePath != null)
 			data.putExtra("savePath", savePath);
@@ -223,6 +225,7 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 			data.putExtra("albumPath", albumPath);
 		data.putExtra("result", obj.toString());
 		setResult(RESULT_OK, data);
+		
 		finish();
 	}
 
@@ -272,6 +275,7 @@ public class CaptureActivity extends Activity implements Callback, OnClickListen
 			Result result = ScannerDecoder.decodeBar(mSelectedImgPath);
 			if (result == null) {
 				callBack("fail", "非法图片");
+				finish();
 			} else {
 				backPreAct(result);
 			}

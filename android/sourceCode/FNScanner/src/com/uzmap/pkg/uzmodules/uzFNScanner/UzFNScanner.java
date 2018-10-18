@@ -70,9 +70,11 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		callBack(moduleContext);//remove by cameracheck at 2017年9月1日17:51:31
 		mJsParamsUtil = JsParamsUtil.getInstance();
 		stopCamera();
-		Intent intent = new Intent(getContext(), CaptureActivity.class);
+		String lineColor = moduleContext.optString("verticalLineColor");
+		Intent intent = new Intent(context(), CaptureActivity.class);
 		initIntentParams(moduleContext, intent);
 		intent.putExtra("isNewUI", false);
+		intent.putExtra("lineColor", lineColor);
 		startActivityForResult(this, intent, OPEN_CODE);
 	}
 	
@@ -82,9 +84,11 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		callBack(moduleContext);//remove by cameracheck at 2017年9月1日17:51:31
 		mJsParamsUtil = JsParamsUtil.getInstance();
 		stopCamera();
-		Intent intent = new Intent(getContext(), CaptureActivity.class);
+		String lineColor = moduleContext.optString("verticalLineColor");
+		Intent intent = new Intent(context(), CaptureActivity.class);
 		initIntentParams(moduleContext, intent);
 		intent.putExtra("isNewUI", true);
+		intent.putExtra("lineColor", lineColor);
 		startActivityForResult(this, intent, OPEN_CODE);
 	}
 
@@ -116,7 +120,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		mJsParamsUtil = JsParamsUtil.getInstance();
 		String sound = mJsParamsUtil.sound(moduleContext);
 		sound = makeRealPath(sound);
-		mBeepUtil = new BeepUtil(mContext, sound);
+		mBeepUtil = new BeepUtil(context(), sound);
 		mBeepUtil.initBeep();
 		decode(moduleContext);
 	}
@@ -130,7 +134,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	
 	public void jsmethod_switchLight(UZModuleContext moduleContext) {
 		mJsParamsUtil = JsParamsUtil.getInstance();
-		//CameraManager.init(mContext);
+		//CameraManager.init(context());
 		switchLight(moduleContext);
 	}
 	
@@ -221,7 +225,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 				mSurfaceView = null;
 			}
 			stopCamera();
-			mSurfaceView = new SurfaceView(mContext);
+			mSurfaceView = new SurfaceView(context());
 			mSurfaceHolder = mSurfaceView.getHolder();
 			mSurfaceHolder.addCallback(this);
 			mSurfaceHolder.setType(3);
@@ -240,7 +244,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 		int saveW = mJsParamsUtil.saveImgW(moduleContext);
 		int saveH = mJsParamsUtil.saveImgH(moduleContext);
 		return ScanUtil.scanResult2img(content, savePath, saveW, saveH,
-				isSaveToAlbum, isBar, mContext);
+				isSaveToAlbum, isBar, context());
 	}
 
 	private void decode(UZModuleContext moduleContext) {
@@ -282,7 +286,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	}
 
 	private void initCaptureView(UZModuleContext moduleContext) {
-		mCaptureView = new CaptureView(mContext, this, moduleContext);
+		mCaptureView = new CaptureView(context(), this, moduleContext);
 	}
 
 	public void insertCaptureView(UZModuleContext moduleContext) {
@@ -297,8 +301,8 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 			UZModuleContext moduleContext) {
 		int x = mJsParamsUtil.x(moduleContext);
 		int y = mJsParamsUtil.y(moduleContext);
-		int width = mJsParamsUtil.w(moduleContext, mContext);
-		int height = mJsParamsUtil.h(moduleContext, mContext, this);
+		int width = mJsParamsUtil.w(moduleContext, context());
+		int height = mJsParamsUtil.h(moduleContext, context(), this);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
 		params.setMargins(x, y, 0, 0);
 		return params;
@@ -374,14 +378,14 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 
 	private void initSelectedImgPath(Intent data) {
 		String[] proj = { MediaStore.Images.Media.DATA };
-		Cursor cursor = mContext.getContentResolver().query(data.getData(),
+		Cursor cursor = context().getContentResolver().query(data.getData(),
 				proj, null, null, null);
 		if (cursor.moveToFirst()) {
 			int column_index = cursor
 					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 			mSelectedImgPath = cursor.getString(column_index);
 			if (mSelectedImgPath == null) {
-				mSelectedImgPath = Utils.getPath(mContext, data.getData());
+				mSelectedImgPath = Utils.getPath(context(), data.getData());
 			}
 		}
 		cursor.close();
@@ -545,10 +549,10 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	}
 
 	public int getDisplayRotation() {
-		if (mContext == null || mContext.getWindowManager() == null) {
+		if (context() == null || ((Activity)context()).getWindowManager() == null) {
 			return 0;
 		}
-		int rotation = mContext.getWindowManager().getDefaultDisplay()
+		int rotation = ((Activity)context()).getWindowManager().getDefaultDisplay()
 				.getRotation();
 		switch (rotation) {
 		case Surface.ROTATION_0:// 涓�
@@ -564,7 +568,7 @@ public class UzFNScanner extends UZModule implements SurfaceHolder.Callback {
 	}
 
 	private final void startOrientationChangeListener() {
-		this.mOrientationListener = new OrientationEventListener(mContext) {
+		this.mOrientationListener = new OrientationEventListener(context()) {
 			public void onOrientationChanged(int rotation) {
 				synchronized (mOrientationListener) {
 					int angle = getDisplayRotation();

@@ -1,9 +1,9 @@
 /**
- * APICloud Modules
- * Copyright (c) 2014-2015 by APICloud, Inc. All Rights Reserved.
- * Licensed under the terms of the The MIT License (MIT).
- * Please see the license.html included with this distribution for details.
- */
+  * APICloud Modules
+  * Copyright (c) 2014-2018 by APICloud, Inc. All Rights Reserved.
+  * Licensed under the terms of the The MIT License (MIT).
+  * Please see the license.html included with this distribution for details.
+  */
 
 #import "UZFNScanner.h"
 #import "NSDictionaryUtils.h"
@@ -19,6 +19,8 @@
 #import "UZCaptureVC.h"
 #import "UZCaptureView.h"
 #import "UZCaptureNewVC.h"
+#import "JQImageCropperViewController.h"
+#import "UIImage+FixOrientation.h"
 
 #define ZBarOrientationMaskNormal \
 (ZBarOrientationMask(UIInterfaceOrientationPortrait) | \
@@ -40,7 +42,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 @property (nonatomic, strong) NSString *openSound, *diySound, *decodeSound;
 @property (nonatomic, strong) UIImageView *background;
 @property (nonatomic, strong) UZCaptureView *captureView;
-
+@property (nonatomic, assign) NSInteger interval;
 @end
 
 @implementation UZFNScanner
@@ -107,16 +109,20 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 - (void)onPause:(NSDictionary *)paramsDict_ {}
 
 - (void)open:(NSDictionary *)paramsDict_ {
+    
     self.openSaveInfo = [paramsDict_ dictValueForKey:@"saveImg" defaultValue:@{}];
     callOpenId = [paramsDict_ integerValueForKey:@"cbId" defaultValue:-1];
     callBackFail = callOpenId;
     NSString *soundStr = [paramsDict_ stringValueForKey:@"sound" defaultValue:nil];
+    NSString *hintText = [paramsDict_ stringValueForKey:@"hintText" defaultValue:@"对准条形码/二维码，即可自动扫描"];
     if ([soundStr isKindOfClass:[NSString class]] && soundStr.length>0) {
         self.openSound = [self getPathWithUZSchemeURL:soundStr];
     }
     BOOL autoLight = NO;
     BOOL autorotaion = [paramsDict_ boolValueForKey:@"autorotation" defaultValue:NO];
     openSaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
+    NSString *verticalLineColor = [paramsDict_ stringValueForKey:@"verticalLineColor" defaultValue:@""];
+    NSString *landscapeLineColor = [paramsDict_ stringValueForKey:@"landscapeLineColor" defaultValue:@""];
     if (isIOS7) {
         if (![self canUseCamera]) {
             [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"cameraError"} errDict:nil doDelete:NO];
@@ -124,7 +130,10 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         }
         UZCaptureNewVC *capture = [[UZCaptureNewVC alloc]init];
         capture.delegate = self;
+        capture.hintText = hintText;
         capture.autoFit = autorotaion;
+        capture.verticalLineColor = verticalLineColor;
+        capture.landscapeLineColor = landscapeLineColor;
         [self.viewController presentViewController:capture animated:YES completion:^(){
             NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
             [sendDict setObject:@"show" forKey:@"eventType"];
@@ -143,7 +152,10 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     }
     BOOL autoLight = NO;
     BOOL autorotaion = [paramsDict_ boolValueForKey:@"autorotation" defaultValue:NO];
+    NSString *hintText = [paramsDict_ stringValueForKey:@"hintText" defaultValue:@"对准条形码/二维码，即可自动扫描"];
     openSaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
+//    NSString *verticalLineColor = [paramsDict_ stringValueForKey:@"verticalLineColor" defaultValue:@""];
+//    NSString *landscapeLineColor = [paramsDict_ stringValueForKey:@"landscapeLineColor" defaultValue:@""];
     if (isIOS7) {
         if (![self canUseCamera]) {
             [self sendResultEventWithCallbackId:callOpenId dataDict:@{@"eventType":@"cameraError"} errDict:nil doDelete:NO];
@@ -152,6 +164,9 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         UZCaptureVC *capture = [[UZCaptureVC alloc]init];
         capture.delegate = self;
         capture.autoFit = autorotaion;
+        capture.hintText = hintText;
+//        capture.verticalLineColor = verticalLineColor;
+//        capture.landscapeLineColor = landscapeLineColor;
         [self.viewController presentViewController:capture animated:YES completion:^(){
             NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
             [sendDict setObject:@"show" forKey:@"eventType"];
@@ -177,7 +192,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     _background = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, width, height)];
     _background.image = [self getImage:@"background"];
     _background.userInteractionEnabled = YES;
-    [reader.view addSubview:_background];
+//    [reader.view addSubview:_background];
     //中间游标
     float arrowx = 48 * width/320;
     float arrowy = 148 * height/568;
@@ -198,7 +213,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     [_background addSubview:cancelButton12];
     //开关闪光灯操作的button
     UIButton *cancelButton1 = [UIButton buttonWithType:UIButtonTypeCustom];
-    [cancelButton1 setFrame:CGRectMake(width-40, 37,15, 22)];
+    [cancelButton1 setFrame:CGRectMake(width-40, 30,15, 22)];
     [cancelButton1 setBackgroundImage:[self getImage:@"light"] forState:UIControlStateNormal];
     cancelButton1.tag = 789;
     [_background addSubview:cancelButton1];
@@ -217,6 +232,9 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     [aubumButton12 setFrame:CGRectMake(width/2-30, 30,45, 42)];
     [aubumButton12 addTarget:self action:@selector(openAlbum:)forControlEvents:UIControlEventTouchUpInside];
     [_background addSubview:aubumButton12];
+    
+    
+    
     aubumButton12.tag = 688;
     reader.supportedOrientationsMask = ZBarOrientationMask(UIInterfaceOrientationPortrait);
     ZBarImageScanner *scanners = reader.scanner;
@@ -279,6 +297,8 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     BOOL autorotation = [paramsDict_ boolValueForKey:@"autorotation" defaultValue:NO];
     BOOL autoLight = NO;
     BOOL fixed = [paramsDict_ boolValueForKey:@"fixed" defaultValue:YES];
+    
+    _interval = [paramsDict_ integerValueForKey:@"interval" defaultValue:3];
     diySaveToAlbum = [paramsDict_ boolValueForKey:@"saveToAlbum" defaultValue:NO];
 
     if (isIOS7) {
@@ -467,6 +487,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark-
 #pragma mark iOS7以后版本上打开的扫描view，扫描成功后的回调扫描的图片
 - (void)didViewScan:(UIImage *)image withResult:(NSString *)result {
+    
     if (![result isKindOfClass:[NSString class]] || result.length==0) {
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:1];
         [sendDict setObject:@"fail" forKey:@"eventType"];
@@ -541,12 +562,15 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
             [self sendResultEventWithCallbackId:callViewBackID dataDict:@{@"eventType":@""} errDict:nil doDelete:NO];
         }
     }
-    [self.captureView.session stopRunning];
-    [self performSelectorOnMainThread:@selector(restart) withObject:nil waitUntilDone:NO];
+    if (_interval > 0) {
+        [self.captureView.session stopRunning];
+        [self performSelectorOnMainThread:@selector(restart) withObject:nil waitUntilDone:NO];
+    }
+    
 }
 #pragma mark ios7以后的系统版本上打开的扫描view 扫描成功后刷新摄像头再开始进行扫描
 - (void)restart {
-  [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(startScann) userInfo:nil repeats:NO];
+  [NSTimer scheduledTimerWithTimeInterval:_interval target:self selector:@selector(startScann) userInfo:nil repeats:NO];
 }
 
 - (void)startScann {
@@ -632,7 +656,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         //retry == 1 选择图片为非二维码。
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];//open的回调
         [sendDict setObject:@"fail" forKey:@"eventType"];
-        [sendDict setObject:@"非法图片" forKey:@"content"];
+        [sendDict setObject:@"未识别图片" forKey:@"content"];
         [self sendResultEventWithCallbackId:callBackFail dataDict:sendDict errDict:@{@"code":@(-100)} doDelete:YES];
         return;
     }
@@ -648,27 +672,42 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
 #pragma mark openScanner Delegate
 #pragma mark-
 #pragma mark iOS6、7、8、9、10从相册选择图片识别/////iOS7以下zbar扫码回调
-- (void)imagePickerController:(UIImagePickerController *)reader didFinishPickingMediaWithInfo:(NSDictionary *)info {//从相册/扫描器获取图片
+- (void)imagePickerController:(UIImagePickerController *)reader didFinishPickingMediaWithInfo:(NSDictionary *)info {//从相册/
+
+//    UIImage *image = [info objectForKey:@"UIImagePickerControllerOriginalImage"];
+    UIImage *image = [UIImage fixOrientation:[info objectForKey:UIImagePickerControllerOriginalImage]];
+    JQImageCropperViewController *imageCropperController = [[JQImageCropperViewController alloc] initWithImage:image cropFrame:CGRectMake(0, (self.viewController.view.bounds.size.height-self.viewController.view.bounds.size.width*1)/2, self.viewController.view.bounds.size.width, self.viewController.view.bounds.size.width*1) limitScaleRatio:5];
+    __weak typeof(self) weakself = self;
+    [imageCropperController setSubmitblock:^(UIViewController *viewController , UIImage *image) {
+        [viewController dismissViewControllerAnimated:YES completion:nil];
+        [weakself APPickerController:reader didFinishPickingMediaWithInfo:info image:image];
+    }];
+    [imageCropperController setCancelblock:^(UIViewController *viewController){
+        [reader dismissViewControllerAnimated:YES completion:nil];
+    }];
+    [reader presentViewController:imageCropperController animated:YES completion:nil];
+}
+-(void)APPickerController:(UIImagePickerController *)reader didFinishPickingMediaWithInfo:(NSDictionary *)info image:(UIImage *)eimage{
+    
+    //扫描器获取图片
     /*openAlbum 从相册读取*/
     if (isImageRead) {
-        UIImage *image = [info objectForKey:@"UIImagePickerControllerEditedImage"];
         if (UI_USER_INTERFACE_IDIOM() ==UIUserInterfaceIdiomPad){
             [self.popoverController dismissPopoverAnimated:YES];
-            [self decodeFromAlbumImage:image];
+            [self decodeFromAlbumImage:eimage];
         } else {
-            [reader dismissViewControllerAnimated:YES completion:^{[self decodeFromAlbumImage:image];}];
+            [reader dismissViewControllerAnimated:YES completion:^{[self decodeFromAlbumImage:eimage];}];
         }
         isImageRead = NO;
         return;
     }
     /*isDecodeImg 解码图片*/
     if (isDecodeImg) {
-        UIImage *image = [info objectForKey:@"UIImagePickerControllerEditedImage"];
         if (UI_USER_INTERFACE_IDIOM() ==UIUserInterfaceIdiomPad){
             [self.popoverController dismissPopoverAnimated:YES];
-            [self decodeFromImage:image];
+            [self decodeFromImage:eimage];
         } else {
-            [reader dismissViewControllerAnimated:YES completion:^{[self decodeFromImage:image];}];
+            [reader dismissViewControllerAnimated:YES completion:^{[self decodeFromImage:eimage];}];
         }
         isDecodeImg = NO;
         return;
@@ -744,7 +783,6 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         }
     }
 }
-
 #pragma mark-
 #pragma mark Scanner OrentationChangedDelegate
 #pragma mark-
@@ -955,7 +993,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
         }
     } else {
         UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-        picker.allowsEditing = YES;
+//        picker.allowsEditing = YES;
         picker.delegate = self;
         picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         [self.viewController presentModalViewController:picker animated:YES];
@@ -989,7 +1027,7 @@ ZBarOrientationMask(UIInterfaceOrientationLandscapeRight))
     } else {//open的回调
         NSMutableDictionary *sendDict = [NSMutableDictionary dictionaryWithCapacity:2];//open的回调
         [sendDict setObject:@"fail" forKey:@"eventType"];
-        [sendDict setObject:@"非法图片" forKey:@"content"];
+        [sendDict setObject:@"未识别图片" forKey:@"content"];
         [self sendResultEventWithCallbackId:callOpenId dataDict:sendDict errDict:nil doDelete:YES];
     }
 }

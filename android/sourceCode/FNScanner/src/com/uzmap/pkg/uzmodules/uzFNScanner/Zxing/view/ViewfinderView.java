@@ -18,6 +18,8 @@ package com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.view;
 
 import java.util.Collection;
 import java.util.HashSet;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -36,6 +38,7 @@ import android.graphics.SweepGradient;
 import android.support.v4.widget.DrawerLayout.DrawerListener;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -43,6 +46,8 @@ import android.widget.TextView;
 import com.apicloud.fnscanner.R;
 import com.google.zxing.ResultPoint;
 import com.uzmap.pkg.uzcore.UZResourcesIDFinder;
+import com.uzmap.pkg.uzkit.UZUtility;
+import com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner;
 import com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.camera.CameraManager;
 
 /**
@@ -72,6 +77,7 @@ public final class ViewfinderView extends View {
 	private static final int SCANNER_LINE_HEIGHT = 10; // 扫描线宽度
 	private int resultColor = 0xB0000000;
 	private int maskColor = 0x60000000;
+	private Context mContext;
 
 	// 扫描线颜色
 	private int laserColor = 0x00FF00;
@@ -95,6 +101,7 @@ public final class ViewfinderView extends View {
 		paint = new Paint();
 		paint.setAntiAlias(true);
 		possibleResultPoints = new HashSet<ResultPoint>(5);
+		this.mContext = context;
 	}
 
 	@Override
@@ -187,10 +194,19 @@ public final class ViewfinderView extends View {
 	 */
 	private void drawTextInfo(Canvas canvas, Rect frame) {
 		paint.setColor(Color.WHITE);
-		paint.setTextSize(30);
+		paint.setTextSize(sp2px(mContext, 14));
 		paint.setTextAlign(Paint.Align.CENTER);
-		canvas.drawText(text, frame.left + frame.width() / 2, frame.bottom + CORNER_RECT_HEIGHT, paint);
+		String hintText = UzFNScanner.mModuleContext.optString("hintText", text);
+		canvas.drawText(hintText, frame.left + frame.width() / 2, frame.bottom + CORNER_RECT_HEIGHT + 10, paint);
 	}
+	
+	/**
+     * 将sp值转换为px值，保证文字大小不变
+     */
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
 
 	private void drawFrame(Canvas canvas, Rect frame) {
 		paint.setColor(Color.parseColor("#90FFFFFF"));
@@ -232,9 +248,19 @@ public final class ViewfinderView extends View {
 		LinearGradient linearGradient = new LinearGradient(frame.left, scannerStart, frame.left,
 				scannerStart + SCANNER_LINE_HEIGHT, shadeColor(laserColor), laserColor, TileMode.MIRROR);
 
-		RadialGradient radialGradient = new RadialGradient((float) (frame.left + frame.width() / 2),
-				(float) (scannerStart + SCANNER_LINE_HEIGHT / 2), 360f, Color.WHITE, shadeColor(Color.WHITE),
-				TileMode.MIRROR);
+		RadialGradient radialGradient;
+		if (TextUtils.isEmpty(mLineColor)) {
+			radialGradient = new RadialGradient((float) (frame.left + frame.width() / 2),
+					(float) (scannerStart + SCANNER_LINE_HEIGHT / 2), 360f, Color.WHITE, shadeColor(Color.WHITE),
+					TileMode.MIRROR);
+		}else {
+			radialGradient = new RadialGradient((float) (frame.left + frame.width() / 2),
+					(float) (scannerStart + SCANNER_LINE_HEIGHT / 2), 360f, UZUtility.parseCssColor(mLineColor), shadeColor(UZUtility.parseCssColor(mLineColor)),
+					TileMode.MIRROR);
+		}
+//		RadialGradient radialGradient = new RadialGradient((float) (frame.left + frame.width() / 2),
+//				(float) (scannerStart + SCANNER_LINE_HEIGHT / 2), 360f, Color.WHITE, shadeColor(Color.WHITE),
+//				TileMode.MIRROR);
 
 		 SweepGradient sweepGradient = new SweepGradient(
 		 (float)(frame.left + frame.width() / 2),
@@ -259,6 +285,11 @@ public final class ViewfinderView extends View {
 			scannerStart = frame.top;
 		}
 		paint.setShader(null);
+	}
+	
+	private String mLineColor;
+	public void setLineColor(String lineColor) {
+		this.mLineColor = lineColor;
 	}
 
 	// 处理颜色模糊
